@@ -27,3 +27,7 @@ Interface
 -meetings 
 -charts with progress
 
+Technologies
+website interface: javascript (React Native, Hero ui),
+backend: java (java spring),
+database: Mongodb or MySql
