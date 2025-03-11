@@ -1,14 +1,41 @@
-import { Link } from "@heroui/link";
-import { Snippet } from "@heroui/snippet";
-import { Code } from "@heroui/code";
-import { button as buttonStyles } from "@heroui/theme";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { signOut } from "@/lib/auth";
+import { Button } from "@heroui/button";
 
-import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
+const Home = async () => {
+  const session = await auth();
 
-export default function Home() {
+  
+  console.log(session?.user);
+  if (!session) redirect("/auth/sign-in");
+
   return (
-    <div><p>halo</p></div>
+    <>
+      <div>
+        <p>{session.user?.name}</p>
+        <form action={async () => {
+          "use server"
+          await signOut();
+        }}>
+          <Button type="submit">Wyloguj</Button>
+        </form>
+        {/* <Button onPress={() => signOut()}>Wyloguj</Button> */}
+      </div>
+    </>
   );
-}
+};
+
+export default Home;
+
+// const Page = async () => {
+//   const session = await auth();
+
+//   return (
+//       <>
+//       <p>halo</p>
+//       </>
+//   );
+// }
+
+// export default Page;

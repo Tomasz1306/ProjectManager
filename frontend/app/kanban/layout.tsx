@@ -1,11 +1,11 @@
-export default function KanbanLayout({
+export default function PricingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <div >
+    <section className="w-full">
+      <div className="">
         {children}
       </div>
     </section>

@@ -28,7 +28,7 @@ export default function KanbanPage() {
   };
 
   const tmpBoard: BoardType = {
-    tasks: [tmpTask1, tmpTask2, tmpTask3 ,tmpTask4],
+    tasks: [tmpTask1, tmpTask2, tmpTask3, tmpTask4],
     id: "1",
     name: "tablica",
   };
@@ -36,8 +36,8 @@ export default function KanbanPage() {
     setMyBoard(tmpBoard);
   }, []);
   return (
-    <div className="">
-      <Board board={myBoard}></Board>
+    <div>
+        <Board board={myBoard}></Board>
     </div>
   );
 }

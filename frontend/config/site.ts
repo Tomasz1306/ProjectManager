@@ -12,6 +12,10 @@ export const siteConfig = {
       label: "Kanban",
       href: "/kanban"
     },
+    {
+      label: "SignIn",
+      href: "/sign-in"
+    },
   ],
   navMenuItems: [
     {

@@ -73,7 +73,7 @@ const Board: React.FC<{ board: BoardType | null }> = ({ board }) => {
   }
 
   return (
-    <div className="dark:bg-gray-900 py-10 relative h-screen">
+    <div className="dark:bg-gray-900 py-10 relative h-screen ">
       <h1 className="font-bold text-center mb-10 text-3xl">
         {board === null ? "BRAK" : board!.name}
       </h1>
