@@ -18,12 +18,13 @@ const Column: React.FC<ColumnProps> = ({ title, tasks, droppableId }) => {
   //modal functions
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 border-1">
       <div className="flex gap-1">
+      <LuDot></LuDot>
         <h2 className="dark:text-white text-sm font-semibold mb-4 uppercase">
           {title}
         </h2>
-        <LuDot></LuDot>
+        
       </div>
       <Droppable droppableId={droppableId}>
         {(provided) => (
