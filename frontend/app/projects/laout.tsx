@@ -4,9 +4,9 @@ export default function PricingLayout({
     children: React.ReactNode;
   }) {
     return (
-      <section className="border-purple-500">
+      <div >
           {children}
-      </section>
+      </div>
     );
   }
   

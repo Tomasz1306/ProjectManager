@@ -44,8 +44,10 @@ export function AppSidebar() {
     <Sidebar className="bg-slate-950">
       <SidebarContent className="bg-gray-900">
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupLabel className="text-3xl">
+            <p className="text-2xl text-white">Project Manager</p>
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="py-2">
             <SidebarMenu>
               {items.map((item) => (
                 <div className="border-1 border-purple-800">

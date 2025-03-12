@@ -17,6 +17,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  usersIssues   UsersIssues[]
+  projectsUsers ProjectsUsers[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
  
@@ -77,4 +79,97 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@id([userId, credentialID])
+}
+
+model Project {
+  projectID Int @unique @default(autoincrement())
+  name String
+  description String
+  startDate DateTime
+  dueDate DateTime
+  creatorId Int
+  logs ProjectLog[]
+  projectsUsers ProjectsUsers[]
+}
+
+model ProjectLog {
+  projectLogID Int @unique @default(autoincrement())
+  description String
+  projectLogDate DateTime
+  project Project @relation(fields: [projectId], references: [projectID])
+  projectId Int
+}
+
+model Issue {
+  issueID            Int @unique @default(autoincrement())
+  name              String @unique
+  description       String 
+  createDate        DateTime
+  dueDate           DateTime
+  status            String
+  priority          String
+  type              String
+  attachaments      Attachament[]
+  comments          Comment[]
+  notes             Note[]
+  tags              Tag[]
+  changes           Change[]
+
+  UsersIssues UsersIssues[]
+}
+
+model Attachament {
+  attachementID Int @unique @default(autoincrement())
+  attachement   String
+  task  Issue @relation(fields:[taskId], references: [issueID])
+  taskId Int
+}
+
+model Comment {
+  commentID Int @unique @default(autoincrement())
+  comment String
+  commentDate DateTime
+  task  Issue @relation(fields:[taskId], references: [issueID])
+  taskId Int
+}
+
+model Note {
+  noteID Int @unique @default(autoincrement())
+  note String
+  noteDate DateTime
+  task  Issue @relation(fields:[taskId], references: [issueID])
+  taskId Int
+}
+
+model Tag {
+  tagID Int @unique @default(autoincrement())
+  tag String
+  task  Issue @relation(fields:[taskId], references: [issueID])
+  taskId Int
+}
+
+model Change {
+  changeID Int @unique @default(autoincrement())
+  changeDate DateTime
+  changeInfo String
+  task  Issue @relation(fields:[taskId], references: [issueID])
+  taskId Int
+}
+
+model UsersIssues {
+  user  User @relation(fields: [userId], references: [id])
+  userId String
+  issue Issue @relation(fields: [issueId], references: [issueID])
+  issueId Int
+
+  @@id([userId, issueId])
+}
+
+model ProjectsUsers {
+  user  User @relation(fields: [userId], references: [id])
+  userId String
+  project Project @relation(fields: [projectId], references: [projectID])
+  projectId Int
+
+  @@id([userId, projectId])
 }

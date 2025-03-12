@@ -10,12 +10,10 @@ const config = {
   theme: {
   	extend: {
   		fontFamily: {
-  			sans: [
-  				'var(--font-sans)'
-  			],
   			mono: [
   				'var(--font-mono)'
-  			]
+  			],
+			roboto: ['var(--font-roboto)', 'sans-serif']
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

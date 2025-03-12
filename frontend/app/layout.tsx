@@ -12,7 +12,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
-import { AuthProvider } from '@/components/AuthProvider'
+import { AuthProvider } from "@/components/AuthProvider";
+
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
 export const metadata: Metadata = {
   title: {
@@ -27,7 +32,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
+    // { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 };
@@ -40,11 +45,25 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html suppressHydrationWarning lang="en">
-      <body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function() {
+  try {
+    var theme = localStorage.getItem('theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    }
+  } catch (e) {}
+})()`,
+          }}
+        />
+      </head>
+      <body className="font-roboto">
         <AuthProvider session={session}>
           <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
             <AppSidebar />
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             {children}
           </Providers>
         </AuthProvider>
