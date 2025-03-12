@@ -1,9 +1,12 @@
+import { ClientLogout } from "@/components/Actions";
 import { title } from "@/components/primitives";
+
+import { Button } from "@heroui/button";
 
 export default function PricingPage() {
   return (
-    <div className="border-1 border-white">
-      <h1 className={title()}>Pricing</h1>
+    <div className="">
+      <Button onPress={ClientLogout}>Sing out</Button>
     </div>
   );
 }

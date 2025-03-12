@@ -4,7 +4,7 @@ export default function SignUpPageLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className=" border-1 border-white flex w-full">
+    <section className=" border-white flex w-full">
       <div className="">
         {children}
       </div>

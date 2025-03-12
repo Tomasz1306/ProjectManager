@@ -1,41 +1,19 @@
-import { auth } from "@/lib/auth";
+"use server";
 import { redirect } from "next/navigation";
-import { signOut } from "@/lib/auth";
-import { Button } from "@heroui/button";
+import { auth } from "@/lib/auth";
+import { LogoutButton } from "@/components/logout-button";
 
-const Home = async () => {
+const Home = async() => {
   const session = await auth();
 
-  
-  console.log(session?.user);
+  console.log(session);
   if (!session) redirect("/auth/sign-in");
 
   return (
     <>
-      <div>
-        <p>{session.user?.name}</p>
-        <form action={async () => {
-          "use server"
-          await signOut();
-        }}>
-          <Button type="submit">Wyloguj</Button>
-        </form>
-        {/* <Button onPress={() => signOut()}>Wyloguj</Button> */}
-      </div>
+    <p>Witaj {session?.user?.email}</p>
     </>
   );
 };
 
 export default Home;
-
-// const Page = async () => {
-//   const session = await auth();
-
-//   return (
-//       <>
-//       <p>halo</p>
-//       </>
-//   );
-// }
-
-// export default Page;

@@ -5,9 +5,7 @@ export default function PricingLayout({
 }) {
   return (
     <section className="w-full">
-      <div className="">
         {children}
-      </div>
     </section>
   );
 }

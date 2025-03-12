@@ -11,6 +11,8 @@ import { Navbar } from "@/components/navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { auth } from "@/lib/auth";
+import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
   title: {
@@ -30,19 +32,22 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
   return (
     <html suppressHydrationWarning lang="en">
       <body>
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <AppSidebar />
-          <SidebarTrigger />
-          {children}
-        </Providers>
+        <AuthProvider session={session}>
+          <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+            <AppSidebar />
+            <SidebarTrigger />
+            {children}
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

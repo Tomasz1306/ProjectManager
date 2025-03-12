@@ -1,8 +1,9 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, PresentationIcon, Search, Settings } from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -10,6 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Button } from "@heroui/button"
+import { LogoutButton } from "./logout-button"
 
 
 // Menu items.
@@ -18,6 +21,11 @@ const items = [
     title: "Home",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "Projects",
+    url: "/projects",
+    icon: PresentationIcon,
   },
   {
     title: "Kanban",
@@ -33,26 +41,31 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar className="bg-slate-950">
+      <SidebarContent className="bg-gray-900">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <div className="border-1 border-purple-800">
+                <SidebarMenuItem className="text-large" key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <p className="text-2xl">{item.title}</p>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                </div>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="bg-gray-900">
+        <LogoutButton/>
+      </SidebarFooter>
     </Sidebar>
   )
 }
