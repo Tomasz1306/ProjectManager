@@ -31,3 +31,9 @@ Technologies
 website interface: javascript (React Native, Hero ui),
 backend: java (java spring),
 database: Mongodb or MySql
+
+
+
+
+Mechanizm pogladu kto jest aktywny i na jakim zadaniu.
+Wyswietlenie logow w czasie rzeczywistym o wszystkich akcjach podejmowanych w projekcie.
