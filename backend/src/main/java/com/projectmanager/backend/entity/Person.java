@@ -52,13 +52,13 @@ public class Person implements UserDetails{
     @Column(name = "image", length = Integer.MAX_VALUE)
     private String image;
 
-    @ColumnDefault("now()")
-    @Column(name = "createdat", nullable = false)
-    private Instant createdat;
+    // @ColumnDefault("now()")
+    // @Column(name = "createdat", nullable = false)
+    // private Instant createdat;
 
-    @ColumnDefault("now()")
-    @Column(name = "updatedat", nullable = false)
-    private Instant updatedat;
+    // @ColumnDefault("now()")
+    // @Column(name = "updatedat", nullable = false)
+    // private Instant updatedat;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -123,21 +123,21 @@ public class Person implements UserDetails{
         this.image = image;
     }
 
-    public Instant getCreatedat() {
-        return createdat;
-    }
+    // public Instant getCreatedat() {
+    //     return createdat;
+    // }
 
-    public void setCreatedat(Instant createdat) {
-        this.createdat = createdat;
-    }
+    // public void setCreatedat(Instant createdat) {
+    //     this.createdat = createdat;
+    // }
 
-    public Instant getUpdatedat() {
-        return updatedat;
-    }
+    // public Instant getUpdatedat() {
+    //     return updatedat;
+    // }
 
-    public void setUpdatedat(Instant updatedat) {
-        this.updatedat = updatedat;
-    }
+    // public void setUpdatedat(Instant updatedat) {
+    //     this.updatedat = updatedat;
+    // }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
