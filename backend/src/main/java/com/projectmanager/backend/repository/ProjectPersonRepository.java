@@ -11,7 +11,7 @@ public interface ProjectPersonRepository extends JpaRepository<ProjectPerson, Pr
 
     List<ProjectPerson> findById_Projectid(Integer projectid);
 
-    List<ProjectPerson> findById_Personid(String personid);
+    List<ProjectPerson> findById_Personid(Integer personid);
 
     @Query("select pp from ProjectPerson pp join fetch pp.personid join fetch pp.projectid where pp.id.projectid = :projectid")
     List<ProjectPerson> findByProjectIdWithDetails(@Param("projectid") Integer projectid);

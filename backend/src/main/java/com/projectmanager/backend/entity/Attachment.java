@@ -1,13 +1,24 @@
 package com.projectmanager.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import org.hibernate.annotations.ColumnDefault;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 @Table(name = "attachament")
-public class Attachament {
-    @Id
-    @ColumnDefault("nextval('attachament_id_seq')")
+public class Attachment {
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Integer id;
 

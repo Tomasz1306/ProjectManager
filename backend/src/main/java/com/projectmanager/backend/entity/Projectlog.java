@@ -1,15 +1,22 @@
 package com.projectmanager.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 @Table(name = "projectlog")
 public class Projectlog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "projectlog_id_gen")
-    @SequenceGenerator(name = "projectlog_id_gen", sequenceName = "projectlog_id_seq", allocationSize = 1)
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Integer id;
 

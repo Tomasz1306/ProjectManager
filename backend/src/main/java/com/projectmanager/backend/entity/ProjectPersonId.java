@@ -2,24 +2,34 @@ package com.projectmanager.backend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Embeddable
 public class ProjectPersonId implements java.io.Serializable {
     private static final long serialVersionUID = -4280631247127405716L;
     @Column(name = "personid", nullable = false, length = Integer.MAX_VALUE)
-    private String personid;
+    private Integer personid;
 
     @Column(name = "projectid", nullable = false)
     private Integer projectid;
 
-    public String getPersonid() {
+    public Integer getPersonid() {
         return personid;
     }
 
-    public void setPersonid(String personid) {
+    public void setPersonid(Integer personid) {
         this.personid = personid;
     }
 

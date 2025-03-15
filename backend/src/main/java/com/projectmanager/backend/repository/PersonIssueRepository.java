@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PersonIssueRepository extends JpaRepository<PersonIssue, PersonIssueId>{
-    List<PersonIssue> findById_Personid(String personid);
+    List<PersonIssue> findById_Personid(Integer personid);
 
     List<PersonIssue> findById_Issueid(Integer issueid);
 
