@@ -4,7 +4,7 @@ import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import CustomizedTimeline from "@/components/timeline";
 import { Listbox, ListboxSection, ListboxItem } from "@heroui/listbox";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import React from "react";
 import { Chip } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
@@ -18,7 +18,7 @@ export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 interface User {
-  id: string;
+  id: number;
   name: string;
   username: string;
   email: string;
@@ -39,8 +39,60 @@ interface Issue {
 }
 
 export default function () {
-  const [users, setUsers] = useState<User[] | undefined>();
-  const [issues, setIssues] = useState<Issue[] | undefined>();
+  const [users, setUsers] = useState<User[]>([]);
+  const addUsers = () => {
+    const newUsers: User[] = [
+      {
+        id: 1,
+        name: 'Tomasz',
+        username: 'Opis pierwszego zadania',
+        email: "halo",
+        emailVerified: new Date(),
+        image: 'otwarte',
+        createDate: new Date()
+      },
+      {
+        id: 2,
+        name: 'Bartek',
+        username: 'okej',
+        email: "halo",
+        emailVerified: new Date(),
+        image: 'otwarte',
+        createDate: new Date()
+      }
+    ];
+    setUsers(prev => [...prev, ...newUsers]);
+  };
+  
+
+  
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const addIssues = () => {
+    const newIssues: Issue[] = [
+      {
+        id: 1,
+        name: 'Pierwsze zadanie',
+        description: 'Opis pierwszego zadania',
+        createDate: new Date(),
+        dueDate: new Date(),
+        status: 'otwarte',
+        priority: 'wysoki',
+        type: 'bug'
+      },
+      {
+        id: 2,
+        name: 'Drugie zadanie',
+        description: 'Opis drugiego zadania',
+        createDate: new Date(),
+        dueDate: new Date(),
+        status: 'otwarte',
+        priority: 'niski',
+        type: 'feature'
+      }
+    ];
+    setIssues(prev => [...prev, ...newIssues]);
+  };
+  
   const [selectedUser, setSelectedUser] = useState<Selection>(new Set(["1"]));
   const [selectedUserIssue, setSelectedUserIssue] = useState<Selection>(
     new Set(["1"])
@@ -53,6 +105,10 @@ export default function () {
   const [progressCodeReviewIssues, setProgressCodeReviewIssues] = useState(20);
   const [progressAnalisysIssues, setProgressAnalisysIssues] = useState(20);
 
+  useEffect(() => {
+    addUsers();
+    addIssues();
+  },[])
   return (
     <div className="w-full flex justify-center ">
       <div className="flex bg-zinc-950 w-[100%] justify-center">

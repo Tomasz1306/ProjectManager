@@ -11,8 +11,6 @@ import { Navbar } from "@/components/navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
-import { AuthProvider } from "@/components/AuthProvider";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -42,7 +40,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
   return (
     <html suppressHydrationWarning lang="en">
       <head>
@@ -60,13 +57,11 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-roboto">
-        <AuthProvider session={session}>
           <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
             <AppSidebar />
             {/* <SidebarTrigger /> */}
             {children}
           </Providers>
-        </AuthProvider>
       </body>
     </html>
   );

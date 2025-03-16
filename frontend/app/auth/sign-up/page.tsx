@@ -1,37 +1,35 @@
 
-import { title } from "@/components/primitives";
-import { signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@heroui/button";
-import { executeAction } from "@/lib/executeAction";
 import { Input } from "@heroui/input";
-import { auth } from "@/lib/auth";
-import {signUp} from "@/lib/actions"
+import { useContext } from "react";
+
 
 const Page = async () => {
 
-  const session = await auth();
-  if (session) redirect("/")
+
+
+  // if ()
 
   return (
     <div className="border-1 border-white">
       <form
-        action={async (formData: FormData) => {
-          "use server";
-          const res = await signUp(formData);
-          console.log(res);
-          if (res.success) {
-            console.log("UTWORZONO");
-            redirect("/kanban");
-          }
-        }}
+        // action={async (formData: FormData) => {
+        //   "use server";
+        //   const res = await signUp(formData);
+        //   console.log(res);
+        //   if (res.success) {
+        //     console.log("UTWORZONO");
+        //     redirect("/kanban");
+        //   }
+        // }}
       >
         <Input
-          name="email"
-          placeholder="email"
-          type="email"
+          name="username"
+          placeholder="username"
+          type="username"
           required
-          autoComplete="email"
+          autoComplete="username"
         />
         <Input
           name="password"
