@@ -1,8 +1,7 @@
 "use client";
-import { redirect } from "next/navigation";
-import { LoginModal } from "@/components/login-modal";
-import { useAuthContext } from "@/components/context/AuthContext";
-import { FormEvent, useContext, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { addToast, ToastProvider } from "@heroui/toast";
 import {
   Modal,
   ModalBody,
@@ -14,80 +13,89 @@ import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
-import { ClientLogin } from "@/components/Actions";
 
+interface Credential {
+  email: string;
+  password: string;
+}
 
 export default function signInPage() {
-  const { authInfo, setAuthInfo } = useAuthContext();
+  const router = useRouter();
+  const [credentials, setCredentials] = useState<Credential>({
+    email: "",
+    password: "",
+  });
   const { isOpen, onOpen, onOpenChange } = useDisclosure({
     isOpen: true,
   });
 
-  const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const response = await ClientLogin(formData);
-    if (response === null) {
+  function handleChange(e: any) {
+    const copy = { ...credentials };
+    const key = e.target.name as keyof typeof copy;
+    copy[key] = e.target.value;
+    setCredentials(copy);
+  }
 
-    } else {
-      console.log(response);
-      setAuthInfo(response);
-      redirect ("/");
-    }
-  };
+  async function handleLoginSubmit() {
+    const res = await fetch("http://localhost:8080/api/v1/auth/authenticate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    console.log(res);
 
-  useEffect(() => {
-    console.log("HALO");
-    if (
-      authInfo.token.length === 0 &&
-      // authInfo.username.length === 0 &&
-      authInfo.email.length === 0 &&
-      authInfo.password.length === 0
-    ) {
-      console.log("WITAM");
+    if (res.ok) {
+      const json = await res.json();
+      console.log(json);
+      localStorage.setItem("token", json.token);
+      localStorage.setItem("email", credentials.email);
+      localStorage.setItem("username", json.username);
+      addToast({
+        title: "Hi, you'e logged correctly",
+        description: "Please rewrite your credentials",
+        color: "success",
+        radius: "none",
+
+      });
+      router.push("/");
     } else {
-      console.log("halo");
-      const fetchAuth = async () => {
-        const response = await fetch(
-          "http://localhost:8080/auth/v1/authenticate",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: authInfo.email,
-              password: authInfo.password,
-            }),
-          }
-        );
-        if (response.ok) {
-          redirect ("/");
-        }
-      };
-      fetchAuth();
+      addToast({
+        title: "Wrong email or password",
+        description: "Please rewrite your credentials",
+        color: "danger",
+        radius: "none",
+        classNames: {
+          base: ([
+              // "border-1 border-purple-600 bg-pink-950"
+          ])
+        },
+      });
     }
-  }, [setAuthInfo]);
+  }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      placement="top-center"
-      onOpenChange={onOpenChange}
-      defaultOpen={true}
-      backdrop="blur"
-      hideCloseButton
-      classNames={{
-        body: "py-6",
-        backdrop: "bg-[#292f46]/50",
-        base: "rounded-sm border-1 border-[#292f46] border-purple-600 bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
-        // header: "border-b-[1px] border-[#292f46]",
-        // footer: "border-t-[1px] border-[#292f46]",
-        // closeButton: "hover:bg-white/5 active:bg-white/10",
-      }}
-    >
-      <ModalContent>
-        <ModalHeader></ModalHeader>
-        <ModalBody>
-          <Form className="" onSubmit={handleLoginSubmit}>
+    <div>
+      <Modal
+        isOpen={isOpen}
+        placement="top-center"
+        onOpenChange={onOpenChange}
+        defaultOpen={true}
+        backdrop="blur"
+        hideCloseButton
+        classNames={{
+          body: "py-6",
+          backdrop: "bg-[#292f46]/50",
+          base: "rounded-sm border-1 border-[#292f46] border-purple-600 bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
+          // header: "border-b-[1px] border-[#292f46]",
+          // footer: "border-t-[1px] border-[#292f46]",
+          // closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          <ModalHeader></ModalHeader>
+          <ModalBody>
             <Input
               variant="underlined"
               size="lg"
@@ -99,6 +107,8 @@ export default function signInPage() {
               name="email"
               placeholder="Enter your email"
               type="email"
+              value={credentials.email}
+              onChange={handleChange}
             ></Input>
             <Input
               variant="underlined"
@@ -111,6 +121,8 @@ export default function signInPage() {
               name="password"
               placeholder="Enter your password"
               type="password"
+              value={credentials.password}
+              onChange={handleChange}
             ></Input>
             <div className="flex flex-col my-4 w-full">
               <Button
@@ -118,26 +130,28 @@ export default function signInPage() {
                  border-purple-600 bg-transparent w-full"
                 size="lg"
                 type="submit"
+                onPress={handleLoginSubmit}
               >
                 Sign in
               </Button>
-              {/* <Button
+              <Button
                 className="rounded-sm border-1
                  border-purple-600 bg-transparent"
                 size="lg"
                 type="reset"
               >
                 Reset
-              </Button> */}
+              </Button>
               <div className="my-4 flex justify-end">
                 <Link className="" href="#" size="sm">
                   Forgot password?
                 </Link>
               </div>
+              <div></div>
             </div>
-          </Form>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </div>
   );
 }
