@@ -3,34 +3,44 @@
 Functionalities:
 
 User hierarchy 
--project manager
--developer
--tester
+-Porduct Owner
+-Scrum Master
+-Developer team
+
 
 Projects
 -making projects 
 -managing projects
 -describing relation beetwen projects
--assigning ppl to project
+-adding ppl to project
+-visualising important information about project (like which issues are completed or not)
+-kanbab board 
+-progress charts
 
 Issues
 -making issues 
 -managing issues
 -assigning ppl to issues 
+-priority
+-type
+-tags
+-comments
+-notes
+-logging system
 
+Meetings
+-meeting dashboard
+-annoucement 
 
+Website
+-login/register panel
+-authentication and authorization
 
-Interface
--map of projects
--relation beetwen projects
--kanban board with issues of project
--meetings 
--charts with progress
 
 Technologies
-website interface: javascript (React Native, Hero ui),
-backend: java (java spring),
-database: Mongodb or MySql
+frontend: typescript (next js)
+backend: java (java spring, java framework, java security, java JPA),
+database: PostgreSQL 
 
 
 
