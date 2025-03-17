@@ -47,3 +47,33 @@ database: PostgreSQL
 
 Mechanizm pogladu kto jest aktywny i na jakim zadaniu.
 Wyswietlenie logow w czasie rzeczywistym o wszystkich akcjach podejmowanych w projekcie.
+
+
+
+Na samej gorze (navBar) panel do szukania (projektow zadan ludzi)
+(przlaczanie miedzy kontekstem wyszukiwania(projektem zadaniem osoba) zrealizowac poprzez tabs w hero ui)
+
+Home
+- informacje o uzytkowniku. Gorny panel:
+- zdjecie 
+- duze imie i nazwisko 
+- mniejszy email
+- stanowisko 
+- przycisk do wyswietlenia informacji
+(mozna rowniez zrealizowac powiadomienia o czekajacych zadaniach, lub meetingach)
+*(lub jezeli bedzie zaimplementowana funkcjonalnosc wiadomosci)
+- jezeli ma drugie stanowisko to tez uwzglednic 
+- odnosniki zebatka do ustawien
+- dzwonek powiadomienia
+
+- kolejne panele: 
+- projekty
+- zadania
+- statystyki o wykonanych projektach lub zadaniach w ktorych uczesniczyl lub rozwiazal uzytkownik
+
+
+- Projekt mozna dodac stan projektu czy jest zapauzowany czy w toku
+(np zapauzowany zablurowac w jakims stopniu i wylaczyc interaktywnosc dla osob ktore nie sa zalozycielami projektu)
+
+--ROLE 
+-role mozna rozdizelic na stanowiska prywatne i role w danym projekcie zalozyciel admin itp (ale nie jest to potrzebne )
