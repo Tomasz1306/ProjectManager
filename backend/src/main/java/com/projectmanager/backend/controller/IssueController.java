@@ -2,19 +2,14 @@ package com.projectmanager.backend.controller;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.projectmanager.backend.entity.Issue;
-import com.projectmanager.backend.entity.Person;
 import com.projectmanager.backend.repository.IssueRepository;
 import com.projectmanager.backend.exception.IssueNotFoundException;
-import com.projectmanager.backend.exception.PersonNotFoundException;
 
 @RestController
 public class IssueController {

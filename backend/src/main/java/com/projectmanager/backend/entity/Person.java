@@ -83,7 +83,8 @@ public class Person implements UserDetails{
 
     @Override
     public String getUsername() {
-        return username;
+        return email; //THERE IS EMAIL BECOUSE OF USERDETAILS STRUCTURE NEEDED TO MAKE A JWT
+                      //DO NOT USE that
     }
 
     public void setUsername(String username) {

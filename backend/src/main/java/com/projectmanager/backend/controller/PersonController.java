@@ -41,12 +41,7 @@ public class PersonController {
 
     @GetMapping(path = "/person", params = "name")
     Person findPersonByName(String name) {
-        return repository.findByUsername(name);
-    }
-
-    @GetMapping(path = "/person", params = "username")
-    Person findPersonByUsername(String username) {
-        return repository.findByUsername(username);
+        return repository.findByName(name);
     }
 
     @GetMapping(path = "/person", params = "email")
