@@ -15,13 +15,17 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 
 interface Credential {
+  name: string;
+  surname: string;
   email: string;
   password: string;
 }
 
-export default function signInPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [credentials, setCredentials] = useState<Credential>({
+    name: "",
+    surname: "",
     email: "",
     password: "",
   });
@@ -36,8 +40,8 @@ export default function signInPage() {
     setCredentials(copy);
   }
 
-  async function handleLoginSubmit() {
-    const res = await fetch("http://localhost:8080/api/v1/auth/authenticate", {
+  async function handleRegisterSubmit() {
+    const res = await fetch("http://localhost:8080/api/v1/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,25 +55,25 @@ export default function signInPage() {
       console.log(json);
       localStorage.setItem("token", json.token);
       localStorage.setItem("email", credentials.email);
-      localStorage.setItem("username", json.username);
+      localStorage.setItem("name", json.name);
+      localStorage.setItem("surname", json.surname);
       addToast({
-        title: "Hi, you'e logged correctly",
-        description: "Please rewrite your credentials",
+        title: "Registration successful",
+        description: "You can now login to your account",
         color: "success",
         radius: "none",
-
       });
-      router.push("/");
+      router.push("/auth/login");
     } else {
       addToast({
-        title: "Wrong email or password",
-        description: "Please rewrite your credentials",
+        title: "Try again",
+        description: "Wrong data",
         color: "danger",
         radius: "none",
         classNames: {
-          base: ([
-              // "border-1 border-purple-600 bg-pink-950"
-          ])
+          base: [
+            // "border-1 border-purple-600 bg-pink-950"
+          ],
         },
       });
     }
@@ -101,6 +105,34 @@ export default function signInPage() {
               size="lg"
               className="font-bold text-large "
               isRequired
+              errorMessage="Please enter a valid name"
+              label="name"
+              labelPlacement="inside"
+              name="name"
+              placeholder="Enter your name"
+              type="name"
+              value={credentials.name}
+              onChange={handleChange}
+            ></Input>
+            <Input
+              variant="underlined"
+              size="lg"
+              className="font-bold text-large "
+              isRequired
+              errorMessage="Please enter a valid surname"
+              label="surname"
+              labelPlacement="inside"
+              name="surname"
+              placeholder="Enter your surname"
+              type="surname"
+              value={credentials.surname}
+              onChange={handleChange}
+            ></Input>
+            <Input
+              variant="underlined"
+              isRequired
+              size="lg"
+              className="font-bold"
               errorMessage="Please enter a valid email"
               label="email"
               labelPlacement="inside"
@@ -130,24 +162,13 @@ export default function signInPage() {
                  border-purple-600 bg-transparent w-full"
                 size="lg"
                 type="submit"
-                onPress={handleLoginSubmit}
+                onPress={handleRegisterSubmit}
               >
-                Sign in
+                Register
               </Button>
-              <Button
-                className="rounded-sm border-1
-                 border-purple-600 bg-transparent"
-                size="lg"
-                type="reset"
-              >
-                Reset
-              </Button>
-              <div className="my-4 flex justify-end">
-                <Link className="" href="#" size="sm">
-                  Forgot password?
-                </Link>
-              </div>
-              <div></div>
+            </div>
+            <div className="flex justify-center">
+              <Link href="/auth/login">Go to login page</Link>
             </div>
           </ModalBody>
         </ModalContent>

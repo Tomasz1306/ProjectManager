@@ -9,13 +9,18 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Kanban",
-      href: "/kanban"
+      label: "Projects",
+      href: "/projects",
     },
     {
-      label: "SignIn",
-      href: "/sign-in"
+      label: "Issues",
+      href: "/issue",
     },
+    {
+      label: "Kanban",
+      href: "/kanban",
+    },
+    
   ],
   navMenuItems: [
     {
@@ -49,10 +54,6 @@ export const siteConfig = {
     {
       label: "Logout",
       href: "/logout",
-    },
-    {
-      label: "Kanban",
-      href: "/kanban"
     },
   ],
   links: {

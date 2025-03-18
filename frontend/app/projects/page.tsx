@@ -2,7 +2,6 @@
 import type { Selection } from "@react-types/shared";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Divider } from "@heroui/divider";
-import CustomizedTimeline from "@/components/timeline";
 import { Listbox, ListboxSection, ListboxItem } from "@heroui/listbox";
 import { useEffect, useMemo, useState } from "react";
 import React from "react";
@@ -44,55 +43,53 @@ export default function () {
     const newUsers: User[] = [
       {
         id: 1,
-        name: 'Tomasz',
-        username: 'Opis pierwszego zadania',
+        name: "Tomasz",
+        username: "Opis pierwszego zadania",
         email: "halo",
         emailVerified: new Date(),
-        image: 'otwarte',
-        createDate: new Date()
+        image: "otwarte",
+        createDate: new Date(),
       },
       {
         id: 2,
-        name: 'Bartek',
-        username: 'okej',
+        name: "Bartek",
+        username: "okej",
         email: "halo",
         emailVerified: new Date(),
-        image: 'otwarte',
-        createDate: new Date()
-      }
+        image: "otwarte",
+        createDate: new Date(),
+      },
     ];
-    setUsers(prev => [...prev, ...newUsers]);
+    setUsers((prev) => [...prev, ...newUsers]);
   };
-  
 
-  
   const [issues, setIssues] = useState<Issue[]>([]);
   const addIssues = () => {
     const newIssues: Issue[] = [
       {
         id: 1,
-        name: 'Pierwsze zadanie',
-        description: 'Opis pierwszego zadania',
+        name: "Pierwsze zadanie",
+        description: "Opis pierwszego zadania",
         createDate: new Date(),
         dueDate: new Date(),
-        status: 'otwarte',
-        priority: 'wysoki',
-        type: 'bug'
+        status: "otwarte",
+        priority: "wysoki",
+        type: "bug",
       },
       {
         id: 2,
-        name: 'Drugie zadanie',
-        description: 'Opis drugiego zadania',
+        name: "Drugie zadanie",
+        description: "Opis drugiego zadania",
         createDate: new Date(),
         dueDate: new Date(),
-        status: 'otwarte',
-        priority: 'niski',
-        type: 'feature'
-      }
+        status: "otwarte",
+        priority: "niski",
+        type: "feature",
+      },
     ];
-    setIssues(prev => [...prev, ...newIssues]);
+    setIssues((prev) => [...prev, ...newIssues]);
   };
-  
+
   const [selectedUser, setSelectedUser] = useState<Selection>(new Set(["1"]));
   const [selectedUserIssue, setSelectedUserIssue] = useState<Selection>(
     new Set(["1"])
@@ -108,11 +105,11 @@ export default function () {
   useEffect(() => {
     addUsers();
     addIssues();
-  },[])
+  }, []);
   return (
     <div className="w-full flex justify-center ">
       <div className="flex bg-zinc-950 w-[100%] justify-center">
-        <div className="flex flex-col my-24 w-[80%]">
+        <div className="flex flex-col my-24 w-[90%]">
           <Card
             className="w-[70%] rounded-sm border-1 
           border-violet-800 bg-neutral-900"
@@ -182,8 +179,7 @@ export default function () {
                         classNames={{
                           base: "max-w-md",
                           track: "drop-shadow-md border border-default",
-                          indicator:
-                            "bg-gradient-to-r from-white to-blue-500",
+                          indicator: "bg-gradient-to-r from-white to-blue-500",
                           label: "tracking-wider font-medium text-default-600",
                           value: "text-foreground/60",
                         }}
@@ -227,8 +223,7 @@ export default function () {
                         classNames={{
                           base: "max-w-md",
                           track: "drop-shadow-md border border-default",
-                          indicator:
-                            "bg-gradient-to-r from-white to-green-400",
+                          indicator: "bg-gradient-to-r from-white to-green-400",
                           label: "",
                           value: "text-foreground/60",
                         }}
@@ -239,10 +234,6 @@ export default function () {
                       />
                     </div>
                   </div>
-                </div>
-
-                <div className="basis-1/3  w-1/3 flex h-full">
-                  <CustomizedTimeline></CustomizedTimeline>
                 </div>
               </div>
             </CardHeader>

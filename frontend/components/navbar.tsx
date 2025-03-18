@@ -25,6 +25,7 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import { redirect } from "next/navigation";
 
 export const Navbar = () => {
   const searchInput = (
@@ -50,28 +51,43 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <p className="font-bold text-inherit">Project Manager</p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
+      <NavbarBrand as="li" className="gap-3 max-w-fit">
+        <Link className="flex justify-start items-center gap-1" href="/">
+          <p className="font-bold text-inherit text-purple-600">
+            Project Manager
+          </p>
+        </Link>
+      </NavbarBrand>
+      <NavbarContent className="" justify="center">
+        {siteConfig.navItems.map((item) => (
+          <NavbarItem key={item.href}>
+            <Link
+              isBlock
+              className={clsx(
+                linkStyles({ color: "foreground" }),
+                "text-large data-[active=true]:text-primary data-[active=true]:font-medium"
+              )}
+              color="foreground"
+              href={item.href}
+            >
+              {item.label}
+            </Link>
+          </NavbarItem>
+        ))}
+      </NavbarContent>
+
+      <NavbarContent className="hidden sm:flex" justify="center">
+        <NavbarItem className="hidden sm:flex gap-2">
+          <ThemeSwitch />
+            <Button as={Link} className="rounded-sm border-2 border-violet-500 bg-violet-950" href="/auth/login">
+              Login
+            </Button>
+
+
+          <Button as={Link} className="rounded-sm border-2 border-purple-500 bg-purple-950" href="/auth/register">
+            Register
+          </Button>
+        </NavbarItem>
       </NavbarContent>
     </HeroUINavbar>
   );
