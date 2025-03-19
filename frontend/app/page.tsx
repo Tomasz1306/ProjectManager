@@ -1,12 +1,4 @@
 "use client";
-import { Link } from "@heroui/link";
-import { Snippet } from "@heroui/snippet";
-import { Code } from "@heroui/code";
-import { button as buttonStyles } from "@heroui/theme";
-
-import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
 import { Avatar } from "@heroui/avatar";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Button, PressEvent } from "@heroui/button";
@@ -20,17 +12,88 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
+import { useRouter } from "next/navigation";
+
+interface Position {
+  id: number;
+  name: string;
+}
+
+interface Valid {
+  valid: boolean;
+}
 
 export default function Home() {
+  const router = useRouter();
+  const [isValidToken, setIsValidToken] = useState(false);
   const [isUpdateInformation, setIsUpdateInformation] = useState(false);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  function handleUpdateInformation(e: PressEvent) {}
-
+  const handlePressedPositionButton = (position: number) => {
+    if (selectedPositions.includes(position)) {
+      setSelectedPositions(selectedPositions.filter((pos) => pos !== position));
+    } else {
+      setSelectedPositions([...selectedPositions, position]);
+    }
+  };
+  useEffect(() => {
+    async function checkToken() {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/checkToken",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+          body: JSON.stringify({
+            email: localStorage.getItem("email"),
+            token: localStorage.getItem("token"),
+          }),
+        }
+      )
+        .then(async (response) => {
+          if (response.ok) {
+            const jsonBody: Valid = await response.json();
+            if (jsonBody.valid) {
+              setIsValidToken(true);
+              setIsUpdateInformation(true);
+            } else {
+              router.push("/auth/login");
+            }
+          }
+        })
+        .catch((response) => {
+          router.push("/auth/login");
+        });
+    }
+    checkToken();
+  }, []);
 
   useEffect(() => {
-    
-  }, [])
+    if (isValidToken) {
+      const fetchPositions = async () => {
+        console.log(localStorage.getItem("token"));
+        const headers = {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        };
+        console.log(headers);
+        const response = await fetch("http://localhost:8080/api/v1/positions", {
+          method: "GET",
+          headers,
+        })
+          .then(async (response) => {
+            const jsonResponse = await response.json();
+            setPositions(jsonResponse);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      };
+      fetchPositions();
+    }
+  }, [isUpdateInformation]);
 
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -94,19 +157,53 @@ export default function Home() {
                         label="Password"
                         color="secondary"
                         size="lg"
-                      >Password</Input>
+                      >
+                        Password
+                      </Input>
                     </div>
                   </div>
-                  <div className="flex justify-center">
-                    <p>Select your roles</p>
+                  <div className="flex flex-col">
+                    <div className="flex justify-center">
+                      <p>Select your roles</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 justify-center my-2">
+                      {positions.map((position) => {
+                        return (
+                          <div className="">
+                            <Button
+                              onPress={() =>
+                                handlePressedPositionButton(position.id)
+                              }
+                              variant="bordered"
+                              className={`border-2 border-violet-400 rounded-sm ${selectedPositions.includes(position.id) ? "bg-violet-950" : "bg-transparent"}`}
+                              size="lg"
+                              color="default"
+                            >
+                              {position.name}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </ModalBody>
               <ModalFooter className="flex flex-row justify-center">
-                <Button color="success" variant="light" className="rounded-sm border-1 border-green-500" onPress={onClose}>
+                <Button
+                  color="success"
+                  variant="light"
+                  className="rounded-sm border-1 border-green-500"
+                  onPress={onClose}
+                >
                   Save
                 </Button>
-                <Button color="danger" variant="light" className="rounded-sm border-1 border-pink-800" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  className="rounded-sm border-1 border-pink-800"
+                  onPress={onClose}
+                >
                   Cancel
                 </Button>
               </ModalFooter>
@@ -137,13 +234,15 @@ export default function Home() {
                 </div>
                 <div className="w-1/3 "></div>
                 <div className="flex w-1/3 justify-end">
-                  <Button
-                    className="w-full rounded-sm border-1 
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      className="w-full rounded-sm border-1 
                   border-purple-600 bg-transparent"
-                    onPress={onOpen}
-                  >
-                    Update information
-                  </Button>
+                      onPress={onOpen}
+                    >
+                      Update information
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardBody>
@@ -151,14 +250,27 @@ export default function Home() {
           <div className="flex flex-row justify-between my-6">
             <Card className="w-[49%] rounded-sm border-1 border-fuchsia-600">
               <CardHeader>
-                <p>Issues</p>
+                <p className="text-2xl">Issues</p>
               </CardHeader>
               <CardBody></CardBody>
               <CardFooter></CardFooter>
             </Card>
             <Card className="w-[49%] rounded-sm border-1 border-fuchsia-600">
               <CardHeader>
-                <p>Projects</p>
+                <div className="w-full flex flex-row justify-between">
+                  <div className="flex justify-start">
+                    <p className="text-2xl">Projects</p>
+                  </div>
+
+                  <div className="flex justify-end w-1/3">
+                    <Button
+                      className=" rounded-sm border-1 
+                  border-purple-600 bg-transparent"
+                    >
+                      Create new project
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardBody></CardBody>
               <CardFooter></CardFooter>

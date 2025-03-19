@@ -59,4 +59,17 @@ public class AuthenticationService {
                         .email(request.getEmail())
                         .build();
     }
+
+    public CheckTokenResponse checkToken(CheckTokenRequest request) {
+        var person = repository.findByEmail(request.getEmail());
+        if (jwtService.isTokenValid(request.getToken(), person)) {
+            return CheckTokenResponse.builder()
+                            .isValid(true)
+                            .build();
+        } else {
+            return CheckTokenResponse.builder()
+                            .isValid(false)
+                            .build();
+        }
+    }
 }

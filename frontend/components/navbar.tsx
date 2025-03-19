@@ -82,10 +82,11 @@ export const Navbar = () => {
             <Button as={Link} className="rounded-sm border-2 border-violet-500 bg-violet-950" href="/auth/login">
               Login
             </Button>
-
-
-          <Button as={Link} className="rounded-sm border-2 border-purple-500 bg-purple-950" href="/auth/register">
-            Register
+          {/* <Button as={Link} className="rounded-sm border-2 border-purple-500 bg-purple-950" href="/auth/register">
+            Log Out
+          </Button> */}
+             <Button as={Link} className="rounded-sm border-2 border-purple-500 bg-purple-950" href="/auth/logout">
+            Log Out
           </Button>
         </NavbarItem>
       </NavbarContent>

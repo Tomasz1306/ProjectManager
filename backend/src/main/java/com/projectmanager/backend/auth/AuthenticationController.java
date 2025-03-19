@@ -2,6 +2,7 @@ package com.projectmanager.backend.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +39,13 @@ public class AuthenticationController {
         @RequestBody LogoutRequest request
     ) {
         return ResponseEntity.ok(service.logout(request));
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/checkToken")
+    public ResponseEntity<CheckTokenResponse> checkToken(
+        @RequestBody CheckTokenRequest request
+    ) {
+        return ResponseEntity.ok(service.checkToken(request));
     }
 }
