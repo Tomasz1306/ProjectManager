@@ -24,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
+    @SuppressWarnings("preview")
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -39,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.substring(7);
+        if (jwtService.isTokenOnBlackList(jwt)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         email = jwtService.extractEmail(jwt);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);

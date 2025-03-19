@@ -31,4 +31,12 @@ public class AuthenticationController {
     ) {
         return ResponseEntity.ok(service.authenticate(request));
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout(
+        @RequestBody LogoutRequest request
+    ) {
+        return ResponseEntity.ok(service.logout(request));
+    }
 }

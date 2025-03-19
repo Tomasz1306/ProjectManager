@@ -51,4 +51,12 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .build();
     }
+
+    public LogoutResponse logout(LogoutRequest request) {
+        var person = repository.findByEmail(request.getEmail());
+        jwtService.addTokenToBlackList(request.getToken(), person);
+        return LogoutResponse.builder()
+                        .email(request.getEmail())
+                        .build();
+    }
 }
