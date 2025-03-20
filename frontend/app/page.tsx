@@ -13,6 +13,8 @@ import {
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
 import { useRouter } from "next/navigation";
+import { createNewProjectModal } from "@/components/createNewProjectModal";
+import { Link } from "@heroui/link";
 
 interface Position {
   id: number;
@@ -37,6 +39,11 @@ export default function Home() {
       setSelectedPositions([...selectedPositions, position]);
     }
   };
+
+  function handleCreateNewProjectButton() {
+    router.push("/projects/create");
+  }
+
   useEffect(() => {
     async function checkToken() {
       const response = await fetch(
@@ -46,7 +53,6 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json",
           },
-          mode: "cors",
           body: JSON.stringify({
             email: localStorage.getItem("email"),
             token: localStorage.getItem("token"),
@@ -62,9 +68,13 @@ export default function Home() {
             } else {
               router.push("/auth/login");
             }
+          } else {
+            router.push("/auth/login")
           }
         })
-        .catch((response) => {
+        .catch((error) => {
+          console.log("halo");
+          console.log("error");
           router.push("/auth/login");
         });
     }
@@ -170,7 +180,7 @@ export default function Home() {
                     <div className="flex flex-wrap gap-2 justify-center my-2">
                       {positions.map((position) => {
                         return (
-                          <div className="">
+                          <div className="" key={position.id}>
                             <Button
                               onPress={() =>
                                 handlePressedPositionButton(position.id)
@@ -179,6 +189,7 @@ export default function Home() {
                               className={`border-2 border-violet-400 rounded-sm ${selectedPositions.includes(position.id) ? "bg-violet-950" : "bg-transparent"}`}
                               size="lg"
                               color="default"
+                              key={position.id}
                             >
                               {position.name}
                             </Button>
@@ -263,12 +274,16 @@ export default function Home() {
                   </div>
 
                   <div className="flex justify-end w-1/3">
-                    <Button
+                    {/* <Button
                       className=" rounded-sm border-1 
                   border-purple-600 bg-transparent"
+                  onPress={() => handleCreateNewProjectButton()}
                     >
                       Create new project
-                    </Button>
+                    </Button> */}
+                    <Link href="/projects/create" size="lg" color="secondary">
+                      Create new project
+                    </Link>
                   </div>
                 </div>
               </CardHeader>
