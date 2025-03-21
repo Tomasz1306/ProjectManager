@@ -82,8 +82,8 @@ public class Person implements UserDetails{
 
     @Override
     public String getUsername() {
-        return email; //THERE IS EMAIL BECOUSE OF USERDETAILS STRUCTURE NEEDED TO MAKE A JWT
-                      //DO NOT USE that
+        return email; //THERE IS EMAIL BECOUSE OF USERDETAILS (FROM SPRING SECURITY) STRUCTURE NEEDED TO MAKE A JWT
+                      //DO NOT CHANGE THAT 
     }
 
     public void setUsername(String username) {

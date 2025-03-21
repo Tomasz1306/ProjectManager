@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { addToast, ToastProvider } from "@heroui/toast";
 import {
   Modal,
@@ -28,12 +28,72 @@ interface Person {
   id: number;
 }
 
+interface createProjectResponse {
+  status: boolean;
+  name: string;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const [search, setSearch] = useState('');
   const [people, setPeople] = useState<Person[]>([]);
+  const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure({
     isOpen: true,
   });
+
+  async function handleCreateProject() {
+    const response = await fetch("http://localhost:8080/api/v1/createProject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({"email": localStorage.getItem("email"), "name": projectName, "description": projectDescription}),
+    });
+
+    if (response.ok) {
+      const jsonResponse: createProjectResponse = await response.json();
+      console.log(jsonResponse);
+      if (jsonResponse.status) {
+        router.push("/projects");
+      }
+    }
+  }
+
+  const handleProjectNameInput = (event:  ChangeEvent<HTMLInputElement> ) => {
+    setProjectName(event.target.value);
+  }
+  const handleProjectDescriptionInput = (event:  ChangeEvent<HTMLInputElement> ) => {
+    setProjectDescription(event.target.value);
+  }
+
+  useEffect(() => {
+    if (search === '') {
+      setPeople([]);
+      return;
+    }
+    const fetchPeople = async() => {
+      const response = await fetch("http://localhost:8080/api/v1/findPerson", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({"email": search})
+      })
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        setPeople(jsonResponse);
+      }
+    }
+    fetchPeople();
+  }, [search]);
+
+  function handleCreate() {
+
+  }
 
   return (
     <div>
@@ -72,6 +132,8 @@ export default function LoginPage() {
                   label="project name"
                   color="secondary"
                   size="lg"
+                  value={projectName}
+                  onChange={handleProjectNameInput}
                 ></Input>
                 <Textarea
                   className="text-2xl"
@@ -81,6 +143,8 @@ export default function LoginPage() {
                   variant="bordered"
                   label="Description"
                   placeholder="Description"
+                  value={projectDescription}
+                  onChange={handleProjectDescriptionInput}
                 ></Textarea>
                 <Accordion>
                   <AccordionItem key={1} title="Mile stones">
@@ -93,8 +157,8 @@ export default function LoginPage() {
                   <AccordionItem key={2} title="Technologies">
 
                   </AccordionItem>
-                  <AccordionItem key={2} title="Add people" >
-                    <Autocomplete label="Select persons" defaultItems={people}>
+                  <AccordionItem key={3} title="Add people" >
+                    <Autocomplete label="Find by email" defaultItems={people} inputValue={search} onInputChange={(e) => setSearch(e)}>
                       {people.map((person) => (
                         <AutocompleteItem key={person.id}>{person.name}</AutocompleteItem>
                       ))}
@@ -113,6 +177,7 @@ export default function LoginPage() {
                       size="lg"
                       variant="light"
                       color="success"
+                      onPress={handleCreateProject}
                     >
                       Create
                     </Button>

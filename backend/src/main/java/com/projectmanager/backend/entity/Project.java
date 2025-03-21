@@ -33,10 +33,10 @@ public class Project {
     @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
     private String description;
 
-    @Column(name = "startdate", nullable = false)
+    @Column(name = "startdate")
     private Instant startdate;
 
-    @Column(name = "duedate", nullable = false)
+    @Column(name = "duedate")
     private Instant duedate;
 
     @Column(name = "creatorid", nullable = false)
