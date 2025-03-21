@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.internal.build.AllowNonPortable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -48,6 +49,7 @@ public class ProjectController {
         String email;
         String description;
         String[] people;
+        String status;
     }
 
     @Data
@@ -59,15 +61,45 @@ public class ProjectController {
         String projectName;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class  completeProjectResponse {
+        Optional<Project> project;
+        Optional<Person> person;
+    }
 
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/projects")
     List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/project/{id}")
     Optional<Project> getProjectById(@PathVariable Integer id) {
         return projectRepository.findById(id);
+    }
+
+    @SuppressWarnings("preview")
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/completeProject/{id}")
+    completeProjectResponse getCompleteProject(@PathVariable("id") Integer projectid) {
+        System.console().println("GET COMPLETE PROJECT");
+        Optional<Project> project = projectRepository.findById(projectid);
+        if (project.isEmpty()) {
+            return completeProjectResponse.builder().build();
+        }
+        Optional<Person> creator = personRepository.findById(project.get().getCreatorid());
+        if (creator.isEmpty()) {
+            return completeProjectResponse.builder().build();
+        }
+        // ADD REST OF PROJECT INFORMATION LIKE ISSUES LOGS ECT...
+        return completeProjectResponse.builder()
+                                    .person(creator)
+                                    .project(project)
+                                    .build();
     }
 
     @GetMapping(path = "/project", params = "description")
@@ -125,6 +157,7 @@ public class ProjectController {
                 .name(request.name)
                 .description(request.description)
                 .creatorid(person.getId())
+                .status(request.status)
                 .build();
         Project savedProject = projectRepository.save(project);
         if (savedProject == null) {

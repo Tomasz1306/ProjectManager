@@ -33,6 +33,9 @@ public class Project {
     @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
     private String description;
 
+    @Column(name = "status", nullable = false)
+    private String status;
+
     @Column(name = "startdate")
     private Instant startdate;
 

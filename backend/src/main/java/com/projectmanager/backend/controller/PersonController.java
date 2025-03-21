@@ -52,13 +52,18 @@ public class PersonController {
         return repository.findAll();
     }
 
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/person")
     Person newPerson(@RequestBody Person newPerson) {
         return repository.save(newPerson);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @SuppressWarnings("preview")
     @GetMapping("/person/{id}")
     Person one(@PathVariable Integer id) {
+        System.console().println("GET PERSON");
         return repository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
     }
 

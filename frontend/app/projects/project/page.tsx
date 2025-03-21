@@ -9,6 +9,10 @@ import { Chip } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
 import { Progress } from "@heroui/progress";
 import { PieChart } from "@mui/x-charts";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Tabs, Tab } from "@heroui/tabs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
 
 export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-full max-w-[400px] border-1 px-1 py-2 rounded-sm border-violet-600 ">
@@ -16,7 +20,7 @@ export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-interface User {
+interface Person {
   id: number;
   name: string;
   username: string;
@@ -37,59 +41,31 @@ interface Issue {
   type: string;
 }
 
-export default function () {
-  const [users, setUsers] = useState<User[]>([]);
-  const addUsers = () => {
-    const newUsers: User[] = [
-      {
-        id: 1,
-        name: "Tomasz",
-        username: "Opis pierwszego zadania",
-        email: "halo",
-        emailVerified: new Date(),
-        image: "otwarte",
-        createDate: new Date(),
-      },
-      {
-        id: 2,
-        name: "Bartek",
-        username: "okej",
-        email: "halo",
-        emailVerified: new Date(),
-        image: "otwarte",
-        createDate: new Date(),
-      },
-    ];
-    setUsers((prev) => [...prev, ...newUsers]);
-  };
+interface Project {
+  name: string;
+  description: string;
+  createDate: Date;
+  status: string;
+  creatorid: number;
+}
 
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const addIssues = () => {
-    const newIssues: Issue[] = [
-      {
-        id: 1,
-        name: "Pierwsze zadanie",
-        description: "Opis pierwszego zadania",
-        createDate: new Date(),
-        dueDate: new Date(),
-        status: "otwarte",
-        priority: "wysoki",
-        type: "bug",
-      },
-      {
-        id: 2,
-        name: "Drugie zadanie",
-        description: "Opis drugiego zadania",
-        createDate: new Date(),
-        dueDate: new Date(),
-        status: "otwarte",
-        priority: "niski",
-        type: "feature",
-      },
-    ];
-    setIssues((prev) => [...prev, ...newIssues]);
-  };
+interface CompleteProject {
+  person: Person;
+  project: Project;
+}
 
+interface Valid {
+  valid: boolean;
+}
+
+export default function ProjectPage(projectId: number) {
+  const params = useSearchParams();
+  // console.log(params.get("projectId"));
+  const router = useRouter();
+  const [isValidToken, setIsValidToken] = useState(false);
+  const [users, setUsers] = useState<Person[]>([]);
+  const [currentProject, setCurrentProject] = useState<Project>();
+  const [creator, setCreator] = useState<Person>();
   const [selectedUser, setSelectedUser] = useState<Selection>(new Set(["1"]));
   const [selectedUserIssue, setSelectedUserIssue] = useState<Selection>(
     new Set(["1"])
@@ -103,242 +79,384 @@ export default function () {
   const [progressAnalisysIssues, setProgressAnalisysIssues] = useState(20);
 
   useEffect(() => {
-    addUsers();
-    addIssues();
+    async function checkToken() {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/checkToken",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: localStorage.getItem("email"),
+            token: localStorage.getItem("token"),
+          }),
+        }
+      )
+        .then(async (response) => {
+          if (response.ok) {
+            const jsonBody: Valid = await response.json();
+            if (jsonBody.valid) {
+              setIsValidToken(true);
+            } else {
+              router.push("/auth/login");
+            }
+          } else {
+            router.push("/auth/login");
+          }
+        })
+        .catch((error) => {
+          console.log("halo");
+          console.log("error");
+          router.push("/auth/login");
+        });
+    }
+    checkToken();
   }, []);
-  return (
-    <div className="w-full flex justify-center ">
-      <div className="flex bg-zinc-950 w-[100%] justify-center">
-        <div className="flex flex-col my-24 w-[90%]">
-          <Card
-            className="w-[70%] rounded-sm border-1 
-          border-violet-800 bg-neutral-900"
-          >
-            <CardHeader className="">
-              <div className="flex flex-row w-full">
-                <div className="basis-1/3 w-1/3 flex flex-col">
-                  <p className="text-3xl">Nazwa projektu</p>
-                  <p className="text-2xl my-4">Opis projektu</p>
-                  <p className="text-lg my-1">Identyfikator i slowa kluczowe</p>
-                </div>
-                <div className="basis-1/3 w-1/3 text-white">
-                  <div className="flex flex-col gap-4">
-                    <PieChart
-                      className="pieChartCustom text-white fill-current"
-                      sx={{
-                        "& text": {
-                          fill: "#00FF00",
-                        },
-                      }}
-                      series={[
-                        {
-                          data: [
-                            {
-                              id: 0,
-                              value: 10,
-                              label: "TODO",
-                              color: "#616161",
-                            },
-                            {
-                              id: 1,
-                              value: 15,
-                              label: "In progress",
-                              color: "#673ab7",
-                            },
-                            {
-                              id: 2,
-                              value: 20,
-                              label: "Completed",
-                              color: "#4caf50",
-                            },
-                          ],
-                        },
-                      ]}
-                      width={400}
-                      height={200}
-                    />
 
-                    <div>
-                      <Progress
-                        label="Developers Issues"
-                        classNames={{
-                          base: "max-w-md",
-                          track: "drop-shadow-md border border-default",
-                          indicator:
-                            "bg-gradient-to-r from-white to-violet-500",
-                          label: "tracking-wider font-medium text-default-600",
-                          value: "text-foreground/60",
-                        }}
-                        color="success"
-                        showValueLabel={true}
-                        size="sm"
-                        value={progressDeveloperIssues}
-                      />
-                      <Progress
-                        label="Analisys Issues"
-                        classNames={{
-                          base: "max-w-md",
-                          track: "drop-shadow-md border border-default",
-                          indicator: "bg-gradient-to-r from-white to-blue-500",
-                          label: "tracking-wider font-medium text-default-600",
-                          value: "text-foreground/60",
-                        }}
-                        color="success"
-                        showValueLabel={true}
-                        size="sm"
-                        value={progressAnalisysIssues}
-                      />
-                      <Progress
-                        label="Code review Issues"
-                        classNames={{
-                          base: "max-w-md",
-                          track: "drop-shadow-md border border-default",
-                          indicator:
-                            "bg-gradient-to-r from-white to-orange-500",
-                          label: "tracking-wider font-medium text-default-600",
-                          value: "text-foreground/60",
-                        }}
-                        color="success"
-                        showValueLabel={true}
-                        size="sm"
-                        value={progressCodeReviewIssues}
-                      />
-                      <Progress
-                        label="Testers Issues"
-                        classNames={{
-                          base: "max-w-md",
-                          track: "drop-shadow-md border border-default",
-                          indicator:
-                            "bg-gradient-to-r from-white to-yellow-400",
-                          label: "tracking-wider font-medium text-default-600",
-                          value: "text-foreground/60",
-                        }}
-                        color="success"
-                        showValueLabel={true}
-                        size="sm"
-                        value={progressTesterIssues}
-                      />
-                      <Progress
-                        label="Completed Issues"
-                        classNames={{
-                          base: "max-w-md",
-                          track: "drop-shadow-md border border-default",
-                          indicator: "bg-gradient-to-r from-white to-green-400",
-                          label: "",
-                          value: "text-foreground/60",
-                        }}
-                        color="success"
-                        showValueLabel={true}
-                        size="sm"
-                        value={progressCompletedIssues}
-                      />
-                    </div>
+  useEffect(() => {
+    async function fetchProject() {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/completeProject/${params.get("projectId")}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (response.ok) {
+        const jsonResponse: CompleteProject = await response.json();
+        console.log(jsonResponse);
+        setCurrentProject(jsonResponse.project);
+        setCreator(jsonResponse.person);
+      }
+    }
+  
+  
+    fetchProject();
+    
+  }, []);
+
+  useEffect(() => {
+    async function fetchProjectCreator() {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/person/${currentProject?.creatorid}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        setCreator(jsonResponse);
+      }
+    }
+    fetchProjectCreator();
+  }, [setCurrentProject]);
+  return (
+    <div className="w-full  border-1">
+      <div className="w-full flex flex-col justify-center">
+        <Tabs
+          aria-label="Project"
+          radius="none"
+          variant="underlined"
+          size="lg"
+          className=" border-purple-600 my-2 flex justify-center"
+          color="secondary"
+        >
+          <Tab title="Overview">
+            <Card key="Overview" title="Overview" className="bg-transparent">
+              <CardBody>
+                <div className="border-1">
+                  <p className="text-4xl">{currentProject?.name}</p>
+                  <div className="flex flex-row justify-start">
+                    <FontAwesomeIcon icon={faEnvelope} size="1x" />
+                    <p>{creator?.email}</p>
                   </div>
                 </div>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <div className="flex flex-row w-full">
-                <div className="basis-1/3 w-1/3">
-                  <ListboxWrapper>
-                    <Listbox
-                      classNames={{
-                        base: "max-w-lg",
-                        list: "max-h-[400px] w-full overflow-scroll",
-                      }}
-                      defaultSelectedKeys={["1"]}
-                      items={users}
-                      label="Assigned to"
-                      selectionMode="single"
-                      //   topContent={}
-                      variant="flat"
-                      onSelectionChange={setSelectedUser}
-                    >
-                      {(item) => (
-                        <ListboxItem key={item.id} textValue={item.name}>
-                          <div className="flex gap-2 items-center">
-                            <Avatar
-                              alt={item.name}
-                              className="flex-shrink-0"
-                              size="sm"
-                              src={item.image}
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-small">{item.name}</span>
-                              <span className="text-tiny text-default-400">
-                                {item.email}
-                              </span>
-                            </div>
-                          </div>
-                        </ListboxItem>
-                      )}
-                    </Listbox>
-                  </ListboxWrapper>
+                <div className="">
+                  <p className="text-lg">Project creator:</p>
+                  <p className="text-lg">Create date:</p>
+                  <p className="text-lg">Project status:</p>
+                  <p className="text-lg">Issues: 15/20</p>
+                  <p className="text-lg">Issues Delayed: 15/20</p>
+                  <p className="text-lg">Budget: 75 000$</p>
+                  <p className="text-lg">Time left: 300h</p>
+                  <p className="text-lg">Time spent: 40h</p>
+                  <p className="text-lg">
+                    Last activity: Issue 4 changed to completed
+                  </p>
+                  <p className="text-lg">Meetings soon</p>
                 </div>
-                <div className="w-1/3">
-                  <p>Role</p>
-                  <Chip
-                    className="bg-violet-600 my-2"
-                    size="lg"
-                    variant="shadow"
-                  >
-                    <p>Developer</p>
-                  </Chip>
-                  <p className="my-2">Issues</p>
-                  <Progress
-                    aria-label="Downloading..."
-                    className="max-w-md"
-                    color="success"
-                    showValueLabel={true}
-                    size="md"
-                    value={progressUserIssues}
-                  />
-                  <div className="my-2">
-                    <ListboxWrapper>
-                      <Listbox
-                        classNames={{
-                          base: "max-w-lg",
-                          list: "max-h-[150px] w-full overflow-scroll",
-                        }}
-                        defaultSelectedKeys={["1"]}
-                        items={issues}
-                        label="Assigned to"
-                        selectionMode="single"
-                        //   topContent={}
-                        variant="flat"
-                        onSelectionChange={setSelectedUserIssue}
-                      >
-                        {(item) => (
-                          <ListboxItem key={item.id} textValue={item.name}>
-                            <div className="flex gap-2 items-center">
-                              <div className="flex flex-col">
-                                <span className="text-small">{item.name}</span>
-                                <span className="text-tiny text-default-400">
-                                  {item.name}
-                                </span>
-                              </div>
-                            </div>
-                          </ListboxItem>
-                        )}
-                      </Listbox>
-                    </ListboxWrapper>
-                  </div>
-                </div>
-                <div className="w-1/3"></div>
-              </div>
-            </CardBody>
-            <CardFooter></CardFooter>
-          </Card>
-          <Card className="w-[90%] mt-4">
-            <CardHeader>
-              <h1>Projekt</h1>
-            </CardHeader>
-            <CardBody></CardBody>
-            <CardFooter></CardFooter>
-          </Card>
-        </div>
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Statistics">
+            <Card>
+              <CardBody></CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Board">
+            <Card>
+              <CardBody></CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Meatings">
+            <Card>
+              <CardBody></CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Discussion">
+            <Card>
+              <CardBody></CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Documentation">
+            <Card>
+              <CardBody></CardBody>
+            </Card>
+          </Tab>
+        </Tabs>
       </div>
     </div>
+
+    // <div className="w-full flex justify-center ">
+    //   <div className="flex bg-zinc-950 w-[100%] justify-center">
+    //     <div className="flex flex-col my-24 w-[100%]">
+    //       <Card
+    //         className="w-full rounded-sm border-1
+    //       border-violet-800 bg-neutral-900"
+    //       >
+    //         <CardBody>
+    //           <div className="flex flex-row w-full">
+    //             <div className="basis-1/3 w-1/3 flex flex-col">
+    //               <p className="text-3xl">Nazwa projektu</p>
+    //               <p className="text-2xl my-4">Opis projektu</p>
+    //               <p className="text-lg my-1">Identyfikator i slowa kluczowe</p>
+    //             </div>
+    //             <div className="basis-1/3 w-1/3 text-white">
+    //               <div className="flex flex-col gap-4">
+    //                 <PieChart
+    //                   className="pieChartCustom text-white fill-current"
+    //                   sx={{
+    //                     "& text": {
+    //                       fill: "#00FF00",
+    //                     },
+    //                   }}
+    //                   series={[
+    //                     {
+    //                       data: [
+    //                         {
+    //                           id: 0,
+    //                           value: 10,
+    //                           label: "TODO",
+    //                           color: "#616161",
+    //                         },
+    //                         {
+    //                           id: 1,
+    //                           value: 15,
+    //                           label: "In progress",
+    //                           color: "#673ab7",
+    //                         },
+    //                         {
+    //                           id: 2,
+    //                           value: 20,
+    //                           label: "Completed",
+    //                           color: "#4caf50",
+    //                         },
+    //                       ],
+    //                     },
+    //                   ]}
+    //                   width={400}
+    //                   height={200}
+    //                 />
+
+    //                 <div>
+    //                   <Progress
+    //                     label="Developers Issues"
+    //                     classNames={{
+    //                       base: "max-w-md",
+    //                       track: "drop-shadow-md border border-default",
+    //                       indicator:
+    //                         "bg-gradient-to-r from-white to-violet-500",
+    //                       label: "tracking-wider font-medium text-default-600",
+    //                       value: "text-foreground/60",
+    //                     }}
+    //                     color="success"
+    //                     showValueLabel={true}
+    //                     size="sm"
+    //                     value={progressDeveloperIssues}
+    //                   />
+    //                   <Progress
+    //                     label="Analisys Issues"
+    //                     classNames={{
+    //                       base: "max-w-md",
+    //                       track: "drop-shadow-md border border-default",
+    //                       indicator: "bg-gradient-to-r from-white to-blue-500",
+    //                       label: "tracking-wider font-medium text-default-600",
+    //                       value: "text-foreground/60",
+    //                     }}
+    //                     color="success"
+    //                     showValueLabel={true}
+    //                     size="sm"
+    //                     value={progressAnalisysIssues}
+    //                   />
+    //                   <Progress
+    //                     label="Code review Issues"
+    //                     classNames={{
+    //                       base: "max-w-md",
+    //                       track: "drop-shadow-md border border-default",
+    //                       indicator:
+    //                         "bg-gradient-to-r from-white to-orange-500",
+    //                       label: "tracking-wider font-medium text-default-600",
+    //                       value: "text-foreground/60",
+    //                     }}
+    //                     color="success"
+    //                     showValueLabel={true}
+    //                     size="sm"
+    //                     value={progressCodeReviewIssues}
+    //                   />
+    //                   <Progress
+    //                     label="Testers Issues"
+    //                     classNames={{
+    //                       base: "max-w-md",
+    //                       track: "drop-shadow-md border border-default",
+    //                       indicator:
+    //                         "bg-gradient-to-r from-white to-yellow-400",
+    //                       label: "tracking-wider font-medium text-default-600",
+    //                       value: "text-foreground/60",
+    //                     }}
+    //                     color="success"
+    //                     showValueLabel={true}
+    //                     size="sm"
+    //                     value={progressTesterIssues}
+    //                   />
+    //                   <Progress
+    //                     label="Completed Issues"
+    //                     classNames={{
+    //                       base: "max-w-md",
+    //                       track: "drop-shadow-md border border-default",
+    //                       indicator: "bg-gradient-to-r from-white to-green-400",
+    //                       label: "",
+    //                       value: "text-foreground/60",
+    //                     }}
+    //                     color="success"
+    //                     showValueLabel={true}
+    //                     size="sm"
+    //                     value={progressCompletedIssues}
+    //                   />
+    //                 </div>
+    //               </div>
+    //             </div>
+    //           </div>
+
+    //           <div className="flex flex-row w-full">
+    //             <div className="basis-1/3 w-1/3">
+    //               <ListboxWrapper>
+    //                 <Listbox
+    //                   classNames={{
+    //                     base: "max-w-lg",
+    //                     list: "max-h-[400px] w-full overflow-scroll",
+    //                   }}
+    //                   defaultSelectedKeys={["1"]}
+    //                   items={users}
+    //                   label="Assigned to"
+    //                   selectionMode="single"
+    //                   //   topContent={}
+    //                   variant="flat"
+    //                   onSelectionChange={setSelectedUser}
+    //                 >
+    //                   {(item) => (
+    //                     <ListboxItem key={item.id} textValue={item.name}>
+    //                       <div className="flex gap-2 items-center">
+    //                         <Avatar
+    //                           key={item.id}
+    //                           alt={item.name}
+    //                           className="flex-shrink-0"
+    //                           size="sm"
+    //                           src={item.image}
+    //                         />
+    //                         <div key={item.id} className="flex flex-col">
+    //                           <span className="text-small">{item.name}</span>
+    //                           <span className="text-tiny text-default-400">
+    //                             {item.email}
+    //                           </span>
+    //                         </div>
+    //                       </div>
+    //                     </ListboxItem>
+    //                   )}
+    //                 </Listbox>
+    //               </ListboxWrapper>
+    //             </div>
+    //             <div className="w-1/3">
+    //               <p>Role</p>
+    //               <Chip
+    //                 className="bg-violet-600 my-2"
+    //                 size="lg"
+    //                 variant="shadow"
+    //               >
+    //                 <p>Developer</p>
+    //               </Chip>
+    //               <p className="my-2">Issues</p>
+    //               <Progress
+    //                 aria-label="Downloading..."
+    //                 className="max-w-md"
+    //                 color="success"
+    //                 showValueLabel={true}
+    //                 size="md"
+    //                 value={progressUserIssues}
+    //               />
+    //               <div className="my-2">
+    //                 <ListboxWrapper>
+    //                   <Listbox
+    //                     classNames={{
+    //                       base: "max-w-lg",
+    //                       list: "max-h-[150px] w-full overflow-scroll",
+    //                     }}
+    //                     defaultSelectedKeys={["1"]}
+    //                     items={issues}
+    //                     label="Assigned to"
+    //                     selectionMode="single"
+    //                     //   topContent={}
+    //                     variant="flat"
+    //                     onSelectionChange={setSelectedUserIssue}
+    //                   >
+    //                     {(item) => (
+    //                       <ListboxItem key={item.id} textValue={item.name}>
+    //                         <div
+    //                           key={item.id}
+    //                           className="flex gap-2 items-center"
+    //                         >
+    //                           <div key={item.id} className="flex flex-col">
+    //                             <span className="text-small">{item.name}</span>
+    //                             <span className="text-tiny text-default-400">
+    //                               {item.name}
+    //                             </span>
+    //                           </div>
+    //                         </div>
+    //                       </ListboxItem>
+    //                     )}
+    //                   </Listbox>
+    //                 </ListboxWrapper>
+    //               </div>
+    //             </div>
+    //             <div className="w-1/3"></div>
+    //           </div>
+    //         </CardBody>
+    //         <CardFooter></CardFooter>
+    //       </Card>
+    //       <Card className="w-[90%] mt-4">
+    //         <CardHeader>
+    //           <h1>Projekt</h1>
+    //         </CardHeader>
+    //         <CardBody></CardBody>
+    //         <CardFooter></CardFooter>
+    //       </Card>
+    //     </div>
+    //   </div>
+    // </div>
   );
 }

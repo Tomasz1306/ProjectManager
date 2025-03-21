@@ -1,6 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, ChangeEventHandler, useContext, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { addToast, ToastProvider } from "@heroui/toast";
 import {
   Modal,
@@ -35,65 +41,77 @@ interface createProjectResponse {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [people, setPeople] = useState<Person[]>([]);
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
+  const [projectStatus, setProjectStatus] = useState('IN PROGRESS');
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure({
     isOpen: true,
   });
 
   async function handleCreateProject() {
     const response = await fetch("http://localhost:8080/api/v1/createProject", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify({"email": localStorage.getItem("email"), "name": projectName, "description": projectDescription}),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({
+        email: localStorage.getItem("email"),
+        name: projectName,
+        description: projectDescription,
+        status: projectStatus,
+      }),
     });
 
     if (response.ok) {
       const jsonResponse: createProjectResponse = await response.json();
       console.log(jsonResponse);
       if (jsonResponse.status) {
+        addToast({
+          title: "SUCCESS",
+          description: "The project was successful created",
+          color: "success",
+          radius: "none",
+        });
         router.push("/projects");
       }
     }
   }
 
-  const handleProjectNameInput = (event:  ChangeEvent<HTMLInputElement> ) => {
+  const handleProjectNameInput = (event: ChangeEvent<HTMLInputElement>) => {
     setProjectName(event.target.value);
-  }
-  const handleProjectDescriptionInput = (event:  ChangeEvent<HTMLInputElement> ) => {
+  };
+  const handleProjectDescriptionInput = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     setProjectDescription(event.target.value);
-  }
+  };
 
   useEffect(() => {
-    if (search === '') {
+    if (search === "") {
       setPeople([]);
       return;
     }
-    const fetchPeople = async() => {
+    const fetchPeople = async () => {
       const response = await fetch("http://localhost:8080/api/v1/findPerson", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + localStorage.getItem("token"),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
-        body: JSON.stringify({"email": search})
-      })
+        body: JSON.stringify({ email: search }),
+      });
       if (response.ok) {
         const jsonResponse = await response.json();
         setPeople(jsonResponse);
       }
-    }
+    };
     fetchPeople();
   }, [search]);
 
-  function handleCreate() {
-
-  }
+  function handleCreate() {}
 
   return (
     <div>
@@ -149,23 +167,37 @@ export default function LoginPage() {
                 <Accordion>
                   <AccordionItem key={1} title="Mile stones">
                     <div className="flex justify-center gap-4">
-                      <Input size="lg" variant="bordered" radius="none" color="secondary" className=" rounded-sm border-purple-500"></Input>
-                      <Button size="lg" className="rounded-sm border-1 border-purple-500" variant="light">Add new mile stone</Button>
-                    </div> 
-                    
+                      <Input
+                        size="lg"
+                        variant="bordered"
+                        radius="none"
+                        color="secondary"
+                        className=" rounded-sm border-purple-500"
+                      ></Input>
+                      <Button
+                        size="lg"
+                        className="rounded-sm border-1 border-purple-500"
+                        variant="light"
+                      >
+                        Add new mile stone
+                      </Button>
+                    </div>
                   </AccordionItem>
-                  <AccordionItem key={2} title="Technologies">
-
-                  </AccordionItem>
-                  <AccordionItem key={3} title="Add people" >
-                    <Autocomplete label="Find by email" defaultItems={people} inputValue={search} onInputChange={(e) => setSearch(e)}>
+                  <AccordionItem key={2} title="Technologies"></AccordionItem>
+                  <AccordionItem key={3} title="Add people">
+                    <Autocomplete
+                      label="Find by email"
+                      defaultItems={people}
+                      inputValue={search}
+                      onInputChange={(e) => setSearch(e)}
+                    >
                       {people.map((person) => (
-                        <AutocompleteItem key={person.id}>{person.name}</AutocompleteItem>
+                        <AutocompleteItem key={person.id}>
+                          {person.name}
+                        </AutocompleteItem>
                       ))}
-                      
                     </Autocomplete>
                   </AccordionItem>
-
                 </Accordion>
               </div>
               <div className="flex justify-center">
@@ -187,6 +219,8 @@ export default function LoginPage() {
                       size="lg"
                       variant="light"
                       color="danger"
+                      as={Link}
+                      href="/projects"
                     >
                       Cancel
                     </Button>

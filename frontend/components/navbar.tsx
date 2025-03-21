@@ -53,7 +53,7 @@ export const Navbar = () => {
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarBrand as="li" className="gap-3 max-w-fit">
         <Link className="flex justify-start items-center gap-1" href="/">
-          <p className="font-bold text-inherit text-purple-600">
+          <p className="font-bold text-inherit text-purple-600 text-3xl">
             Project Manager
           </p>
         </Link>

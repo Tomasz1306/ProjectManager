@@ -281,9 +281,15 @@ export default function Home() {
                     >
                       Create new project
                     </Button> */}
+                    <div className="flex flex-col gap-4">
+                    <Link href="/projects" size="lg" color="secondary" >
+                      Go to projects
+                    </Link>
                     <Link href="/projects/create" size="lg" color="secondary">
                       Create new project
                     </Link>
+                    </div>
+                    
                   </div>
                 </div>
               </CardHeader>

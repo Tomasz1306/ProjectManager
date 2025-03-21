@@ -1,9 +1,12 @@
 "use client";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
+import { Link } from "@heroui/link";
+import { addToast } from "@heroui/toast";
 import type { Selection } from "@react-types/shared";
 import { useEffect, useMemo, useState } from "react";
 import React from "react";
+import NextLink from "next/link";
 
 interface Project {
   name: string;
@@ -26,13 +29,24 @@ export default function () {
       }
     );
     if (response.ok) {
-      // ADD TOAST DELETED SUCCESSFUL
+      addToast({
+        title: "SUCCESS!",
+        description: "The project was successful deleted",
+        color: "danger",
+        radius: "none",
+      });
 
       setProjects(
         projects.filter((project, index) => project.id !== projectId)
       );
     } else if (response.status === 404) {
       // PROJECT NOT FOUND
+      addToast({
+        title: "WARNING",
+        description: "Project not found",
+        color: "warning",
+        radius: "none",
+      });
       console.log("project not found");
     }
   }
@@ -60,8 +74,22 @@ export default function () {
   }, []);
 
   return (
-    <div className="w-full flex justify-center ">
-      <div className="flex bg-zinc-950 w-[100%] justify-center">
+    <div className="w-full flex flex-col justify-center">
+      <div className="flex justify-end ">
+        <Button
+          as={Link}
+          variant="light"
+          color="success"
+          size="lg"
+          radius="none"
+          className="border-1 border-green-500"
+          href="/projects/create"
+        >
+          Create
+        </Button>
+      </div>
+
+      <div className="flex bg-zinc-950 w-[100%] justify-center my-2">
         <div className="w-full flex flex-col gap-4">
           {projects.map((project) => (
             <div key={project.id} className="w-full border-1">
@@ -79,6 +107,13 @@ export default function () {
                         color="secondary"
                         radius="none"
                         className="border-1 border-purple-500"
+                        as={NextLink}
+                        href={{
+                          pathname: `/projects/project`,
+                          query: {
+                            projectId: `${project.id}`,
+                          },
+                        }}
                       >
                         Open
                       </Button>
