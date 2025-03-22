@@ -1,12 +1,8 @@
 package com.projectmanager.backend.controller;
 
-import java.io.Console;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jackson.JsonObjectSerializer;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.projectmanager.backend.entity.Person;
 import com.projectmanager.backend.exception.PersonNotFoundException;
 import com.projectmanager.backend.repository.PersonRepository;
@@ -63,7 +56,6 @@ public class PersonController {
     @SuppressWarnings("preview")
     @GetMapping("/person/{id}")
     Person one(@PathVariable Integer id) {
-        System.console().println("GET PERSON");
         return repository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
     }
 
@@ -72,17 +64,11 @@ public class PersonController {
         return repository.findByName(name);
     }
 
-    // @CrossOrigin(origins = "http://localhost:8080")
+    @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping(path = "/person", params = "email")
     Person findPersonByEmail(String email) {
         return repository.findByEmail(email);
     }
-
-    // @CrossOrigin(origins = "http://localhost:3000")
-    // @PostMapping(path ="/findPerson")
-    // List<Person> findPersonsByNameKey(@RequestBody String key) {
-    //     return repository.findBynameStartingWith(key);
-    // }
 
     @SuppressWarnings("preview")
     @CrossOrigin(origins = "http://localhost:3000")

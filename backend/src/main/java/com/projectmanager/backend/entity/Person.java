@@ -1,17 +1,7 @@
 package com.projectmanager.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +15,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Entity
 @Table(name = "person")
 public class Person implements UserDetails{
@@ -58,6 +47,10 @@ public class Person implements UserDetails{
     // @ColumnDefault("now()")
     // @Column(name = "updatedat", nullable = false)
     // private Instant updatedat;
+
+
+    // @OneToMany(mappedBy = "personid",  fetch = FetchType.EAGER)
+    // List<ProjectPerson> projectPersons;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)

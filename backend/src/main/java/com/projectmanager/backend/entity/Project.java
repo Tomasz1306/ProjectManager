@@ -1,17 +1,9 @@
 package com.projectmanager.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-import org.hibernate.annotations.ColumnDefault;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.Instant;
 
@@ -19,8 +11,9 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
+// @ToString(exclude = "projectPersons")
 @Table(name = "project")
 public class Project {
     @Id @GeneratedValue(strategy=GenerationType.AUTO)
@@ -44,6 +37,11 @@ public class Project {
 
     @Column(name = "creatorid", nullable = false)
     private Integer creatorid;
+
+    // @JsonBackReference
+    // @JsonIgnore
+    // @OneToMany(mappedBy = "projectid", fetch = FetchType.EAGER)
+    // List<ProjectPerson> projectPersons;
 
     public Integer getId() {
         return id;

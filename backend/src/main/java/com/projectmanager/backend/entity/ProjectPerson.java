@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "project_person")
 public class ProjectPerson {
@@ -24,12 +26,15 @@ public class ProjectPerson {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "personid", nullable = false)
+    // @JsonIgnore
     private Person personid;
 
     @MapsId("projectid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "projectid", nullable = false)
+    // @JsonManagedReference
+    // @JsonIgnore
     private Project projectid;
 
     public ProjectPersonId getId() {
@@ -47,7 +52,6 @@ public class ProjectPerson {
     public void setPersonid(Person personid) {
         this.personid = personid;
     }
-
     public Project getProjectid() {
         return projectid;
     }
@@ -55,5 +59,4 @@ public class ProjectPerson {
     public void setProjectid(Project projectid) {
         this.projectid = projectid;
     }
-
 }

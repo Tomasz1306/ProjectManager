@@ -13,4 +13,5 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>{
     List<Project> findByStartdate(Instant startdate);
     List<Project> findByDuedate(Instant duedate);
     List<Project> findByCreatorid(Integer creatorid);
+    List<Project> findByIdIn(List<Integer> ids);
 }

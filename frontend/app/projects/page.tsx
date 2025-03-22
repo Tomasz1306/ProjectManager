@@ -8,15 +8,21 @@ import { useEffect, useMemo, useState } from "react";
 import React from "react";
 import NextLink from "next/link";
 
-interface Project {
+interface project {
   name: string;
   description: string;
   creatorid: number;
   id: number;
+  duedate: string;
+  status: string;
+}
+
+interface ProjectResponse {
+  projects: project[]
 }
 
 export default function () {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<project[]>([]);
 
   async function handleDeleteProject(projectId: number) {
     const response = await fetch(
@@ -64,9 +70,10 @@ export default function () {
       );
 
       if (response.ok) {
-        const jsonResponse: Project[] = await response.json();
+        console.log(response);
+        const jsonResponse: ProjectResponse = await response.json();
         console.log(jsonResponse);
-        setProjects(jsonResponse);
+        setProjects(jsonResponse.projects);
       }
     }
 

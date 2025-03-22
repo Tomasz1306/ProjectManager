@@ -1,10 +1,11 @@
 package com.projectmanager.backend.controller;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.internal.build.AllowNonPortable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -70,6 +71,14 @@ public class ProjectController {
         Optional<Person> person;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class projectsResponse {
+        List<Project> projects;
+    }
+
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/projects")
@@ -86,7 +95,6 @@ public class ProjectController {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/completeProject/{id}")
     completeProjectResponse getCompleteProject(@PathVariable("id") Integer projectid) {
-        System.console().println("GET COMPLETE PROJECT");
         Optional<Project> project = projectRepository.findById(projectid);
         if (project.isEmpty()) {
             return completeProjectResponse.builder().build();
@@ -134,11 +142,28 @@ public class ProjectController {
 
     }
 
+    @JsonIgnore
+    @SuppressWarnings("preview")
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path = "/projects", params = "email")
-    List<Project> getProjectsByCreatorId(String email) {
+    projectsResponse getProjectsByCreatorId(String email) {
         Person person = personRepository.findByEmail(email);
-        return projectRepository.findByCreatorid(person.getId());
+        List<ProjectPerson> projectPerson = projectPersonRepository.findById_Personid(person.getId());
+        System.out.println(projectPerson.get(0).getProjectid().getId());
+        List<Optional<Project>> optionalProjects = new ArrayList<>();
+        for (int i = 0; i < projectPerson.size(); i++) {
+            optionalProjects.add(projectRepository.findById(projectPerson.get(i).getProjectid().getId()));
+        }
+
+        List<Project> projects = new ArrayList<>();
+        for (int i = 0; i < optionalProjects.size(); i++) {
+            if (optionalProjects.get(i).isPresent()) {
+                System.out.println(optionalProjects.get(i).get().getName());
+                projects.add(optionalProjects.get(i).get());
+            }
+        }
+        System.out.println(projects.getFirst());
+        return projectsResponse.builder().projects(projects).build();
     }
 
     @SuppressWarnings("preview")

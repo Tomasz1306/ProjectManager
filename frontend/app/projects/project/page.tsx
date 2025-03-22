@@ -13,7 +13,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, Tab } from "@heroui/tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
-
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import { Alert } from "@heroui/alert";
+import { cn } from "@heroui/theme";
 export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-full max-w-[400px] border-1 px-1 py-2 rounded-sm border-violet-600 ">
     {children}
@@ -66,6 +70,7 @@ export default function ProjectPage(projectId: number) {
   const [users, setUsers] = useState<Person[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
+  const [projectIssues, setProjectIssues] = useState<Issue[]>([]);
   const [selectedUser, setSelectedUser] = useState<Selection>(new Set(["1"]));
   const [selectedUserIssue, setSelectedUserIssue] = useState<Selection>(
     new Set(["1"])
@@ -130,12 +135,11 @@ export default function ProjectPage(projectId: number) {
         console.log(jsonResponse);
         setCurrentProject(jsonResponse.project);
         setCreator(jsonResponse.person);
+        // setProjectIssues(jsonResponse.)
       }
     }
-  
-  
+
     fetchProject();
-    
   }, []);
 
   useEffect(() => {
@@ -157,30 +161,68 @@ export default function ProjectPage(projectId: number) {
     fetchProjectCreator();
   }, [setCurrentProject]);
   return (
-    <div className="w-full  border-1">
+    <div className="w-full  border-1 dark:bg-stone-800">
       <div className="w-full flex flex-col justify-center">
         <Tabs
           aria-label="Project"
           radius="none"
           variant="underlined"
           size="lg"
-          className=" border-purple-600 my-2 flex justify-center"
+          className=" border-purple-600 my-2 flex justify-center "
           color="secondary"
         >
           <Tab title="Overview">
-            <Card key="Overview" title="Overview" className="bg-transparent">
+            <p className="text-small text-default-500 mx-3">Project name</p>
+            <p className="text-4xl mx-3">{currentProject?.name}</p>
+            <Card key="Overview" title="Overview" className="bg-transparent my-2" radius="none">
               <CardBody>
-                <div className="border-1">
-                  <p className="text-4xl">{currentProject?.name}</p>
-                  <div className="flex flex-row justify-start">
-                    <FontAwesomeIcon icon={faEnvelope} size="1x" />
-                    <p>{creator?.email}</p>
+                <div className=" flex flex-row">
+                  <div className="basis-1/3">
+                    <p className="text-small text-default-500">Creator info</p>
+                    <div className="flex flex-row justify-start gap-3 my-2">
+                      <EmailOutlinedIcon />
+                      <p>{creator?.email}</p>
+                    </div>
+                    <div className="flex flex-row justify-start gap-3 my-2">
+                      <LocalPhoneOutlinedIcon />
+                      <p>664 334 443</p>
+                    </div>
+                    <div className="flex flex-row justify-start gap-3">
+                      <CalendarMonthOutlinedIcon />
+                      <p>Create date:</p>
+                    </div>
+                  </div>
+                  <div className="flex basis-1/3 justify-start">
+                    <div>
+                      <p className="">Status: </p>
+                    </div>
+                  </div>
+                  <div className="basis-1/3">
+                    <p>Last actions</p>
+                    <Listbox className="h-[150px]" variant="light">
+                      <ListboxItem>
+                        <p>Finished task nr 234</p>
+                      </ListboxItem>
+                      <ListboxItem>
+                        <p>Finished task nr 34</p>
+                      </ListboxItem>
+                      <ListboxItem>
+                        <p>Finished task nr 224</p>
+                      </ListboxItem>
+                      <ListboxItem>
+                        <p>Finished task nr 456</p>
+                      </ListboxItem>
+                      <ListboxItem>
+                        <p>Finished task nr 12</p>
+                      </ListboxItem>
+                      <ListboxItem>
+                        <p>Finished task nr 43</p>
+                      </ListboxItem>
+                    </Listbox>
                   </div>
                 </div>
+                <Divider className="my-2"></Divider>
                 <div className="">
-                  <p className="text-lg">Project creator:</p>
-                  <p className="text-lg">Create date:</p>
-                  <p className="text-lg">Project status:</p>
                   <p className="text-lg">Issues: 15/20</p>
                   <p className="text-lg">Issues Delayed: 15/20</p>
                   <p className="text-lg">Budget: 75 000$</p>
@@ -191,6 +233,15 @@ export default function ProjectPage(projectId: number) {
                   </p>
                   <p className="text-lg">Meetings soon</p>
                 </div>
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab title="Backlog">
+            <Card>
+              <CardBody>
+                <Listbox>
+
+                </Listbox>
               </CardBody>
             </Card>
           </Tab>
