@@ -149,7 +149,7 @@ public class ProjectController {
     projectsResponse getProjectsByCreatorId(String email) {
         Person person = personRepository.findByEmail(email);
         List<ProjectPerson> projectPerson = projectPersonRepository.findById_Personid(person.getId());
-        System.out.println(projectPerson.get(0).getProjectid().getId());
+//        System.out.println(projectPerson.get(0).getProjectid().getId());
         List<Optional<Project>> optionalProjects = new ArrayList<>();
         for (int i = 0; i < projectPerson.size(); i++) {
             optionalProjects.add(projectRepository.findById(projectPerson.get(i).getProjectid().getId()));

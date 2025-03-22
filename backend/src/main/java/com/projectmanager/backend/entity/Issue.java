@@ -13,11 +13,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // BARDZO WAZNA LINIJKA 
 @Entity
 @Table(name = "issue")
 public class Issue {

@@ -58,6 +58,10 @@ interface CompleteProject {
   project: Project;
 }
 
+interface IssueResponse {
+  issues: Issue[];
+}
+
 interface Valid {
   valid: boolean;
 }
@@ -67,6 +71,7 @@ export default function ProjectPage(projectId: number) {
   // console.log(params.get("projectId"));
   const router = useRouter();
   const [isValidToken, setIsValidToken] = useState(false);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [users, setUsers] = useState<Person[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
@@ -141,6 +146,23 @@ export default function ProjectPage(projectId: number) {
 
     fetchProject();
   }, []);
+
+  useEffect(() => {
+    async function fetchProjectIssues() {
+      const response = await fetch(`http://localhost:8080/api/v1/projectIssues/${params.get("projectId")}`,{
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer" + localStorage.getItem("token"),
+        }
+      });
+      if (response.ok) {
+        const jsonResponse: IssueResponse = await response.json();
+        setIssues(jsonResponse.issues);
+        console.log(jsonResponse);
+      }
+    }
+    fetchProjectIssues();
+  }, [])
 
   useEffect(() => {
     async function fetchProjectCreator() {
@@ -239,9 +261,9 @@ export default function ProjectPage(projectId: number) {
           <Tab title="Backlog">
             <Card>
               <CardBody>
-                <Listbox>
+                {/* <Listbox>
 
-                </Listbox>
+                </Listbox> */}
               </CardBody>
             </Card>
           </Tab>
