@@ -55,6 +55,24 @@ npm run dev
 
     PostgreSQL 14+
 
+## 📌 Roadmap
+
+- [x] Rejestracja i logowanie
+  - [x] Formularz rejestracji
+  - [x] Logowanie z JWT
+- [x] CRUD projektów i zadań
+  - [x] Tworzenie projektu
+  - [x] Dodawanie zadań
+  - [x] Edycja i usuwanie
+- [ ] Komentarze i powiadomienia
+  - [ ] Komentarze do zadań
+  - [ ] Powiadomienia e-mail
+- [ ] Integracja z kalendarzem
+  - [ ] Widok kalendarza
+  - [ ] Synchronizacja z Google Calendar
+- [ ] RWD i PWA
+  - [ ] Responsywny UI
+  - [ ] Tryb offline (PWA)
 
 ProjectManager/
 ├── backend/           # Serwer Spring Boot
