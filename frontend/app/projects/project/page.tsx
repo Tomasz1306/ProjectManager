@@ -1,11 +1,12 @@
 "use client";
 import type { Selection } from "@react-types/shared";
+import { SortDescriptor } from "@heroui/react";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Listbox, ListboxSection, ListboxItem } from "@heroui/listbox";
-import { useEffect, useMemo, useState } from "react";
+import { SVGProps, useEffect, useMemo, useState } from "react";
 import React from "react";
-import { Chip } from "@heroui/chip";
+import { Chip, ChipProps } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
 import { Progress } from "@heroui/progress";
 import { PieChart } from "@mui/x-charts";
@@ -19,11 +20,80 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import { Alert } from "@heroui/alert";
 import { cn } from "@heroui/theme";
 import { SharedSelection } from "@heroui/system";
+import { Pagination } from "@heroui/pagination";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/dropdown";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@heroui/table";
+import { User } from "@heroui/user";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { capitalize } from "@mui/material";
 export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-full max-w-[400px] border-1 px-1 py-2 rounded-sm border-violet-600 ">
     {children}
   </div>
 );
+
+export const LowPriorityIcon = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+};
+
+export const MediumPriorityIcon = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="7" x2="12" y2="13" />
+      <circle cx="12" cy="16" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+};
+
+export const HighPriorityIcon = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      {...props}
+    >
+      <polygon points="12,2 22,20 2,20" />
+      <line x1="12" y1="8" x2="12" y2="14" />
+      <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+};
 
 export const BugIcon = (
   props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
@@ -54,6 +124,144 @@ export const IconWrapper = ({ children, className }) => (
     {children}
   </div>
 );
+
+export type IconSvgProps = SVGProps<SVGSVGElement> & {
+  size?: number;
+};
+
+export const PlusIcon = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}: IconSvgProps) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height={size || height}
+      role="presentation"
+      viewBox="0 0 24 24"
+      width={size || width}
+      {...props}
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+      >
+        <path d="M6 12h12" />
+        <path d="M12 18V6" />
+      </g>
+    </svg>
+  );
+};
+
+export const VerticalDotsIcon = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}: IconSvgProps) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height={size || height}
+      role="presentation"
+      viewBox="0 0 24 24"
+      width={size || width}
+      {...props}
+    >
+      <path
+        d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const SearchIcon = (props: IconSvgProps) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      role="presentation"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M22 22L20 20"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+};
+
+export const ChevronDownIcon = ({
+  strokeWidth = 1.5,
+  ...otherProps
+}: IconSvgProps) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      role="presentation"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...otherProps}
+    >
+      <path
+        d="m19.92 8.95-6.52 6.52c-.77.77-2.03.77-2.8 0L4.08 8.95"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit={10}
+        strokeWidth={strokeWidth}
+      />
+    </svg>
+  );
+};
+
+export const columns = [
+  { name: "ID", uid: "id", sortable: true },
+  { name: "NAME", uid: "name", sortable: true },
+  { name: "STATUS", uid: "status", sortable: true },
+  { name: "PRIORITY", uid: "priority", sortable: true },
+  { name: "TYPE", uid: "type" },
+  { name: "ACTIONS", uid: "actions" },
+];
+
+export const statusOptions = [
+  { name: "Active", uid: "active" },
+  { name: "Paused", uid: "paused" },
+  { name: "Vacation", uid: "vacation" },
+];
+
+const statusColorMap: Record<string, ChipProps["color"]> = {
+  active: "success",
+  paused: "danger",
+  vacation: "warning",
+};
 
 interface Person {
   id: number;
@@ -97,40 +305,15 @@ interface Valid {
   valid: boolean;
 }
 
+const INITIAL_VISIBLE_COLUMNS = ["id", "name", "status", "priority", "type"];
+
 export default function ProjectPage(projectId: number) {
   const params = useSearchParams();
-  // console.log(params.get("projectId"));
   const router = useRouter();
   const [isValidToken, setIsValidToken] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
-  const [users, setUsers] = useState<Person[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
-  const [backLogSelectedIssue, setBackLogSelectedIssue] = useState(
-    new Set(["7"])
-  );
-  const [projectIssues, setProjectIssues] = useState<Issue[]>([]);
-  const [selectedUser, setSelectedUser] = useState<Selection>(new Set(["1"]));
-  const [selectedUserIssue, setSelectedUserIssue] = useState<Selection>(
-    new Set(["1"])
-  );
-  const [progressUserIssues, setProgressUserIssues] = useState(20);
-  const [progressProjectIssues, setProgressProjectIssues] = useState(80);
-  const [progressDeveloperIssues, setProgressDeveloperIssues] = useState(20);
-  const [progressTesterIssues, setProgressTesterIssues] = useState(20);
-  const [progressCompletedIssues, setProgressCompletedIssues] = useState(20);
-  const [progressCodeReviewIssues, setProgressCodeReviewIssues] = useState(20);
-  const [progressAnalisysIssues, setProgressAnalisysIssues] = useState(20);
-
-  const handleSelectionBackLogSelectedIssue = (key: SharedSelection) => {
-    const selectedKey = new Set<string>();
-    if (typeof key === "string") {
-      selectedKey.add(key);
-    } else if (key.currentKey) {
-      selectedKey.add(key.currentKey);
-    }
-    setBackLogSelectedIssue(selectedKey);
-  };
 
   useEffect(() => {
     async function checkToken() {
@@ -209,6 +392,324 @@ export default function ProjectPage(projectId: number) {
     }
     fetchProjectIssues();
   }, []);
+
+  const [filterValue, setFilterValue] = React.useState("");
+  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
+    new Set([])
+  );
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
+  const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    column: "id",
+    direction: "descending",
+  });
+
+  const [page, setPage] = React.useState(1);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const headerColumns = React.useMemo(() => {
+    if (visibleColumns === "all") return columns;
+
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns]);
+
+  const filteredItems = React.useMemo(() => {
+    let filteredUsers = [...issues];
+
+    if (hasSearchFilter) {
+      filteredUsers = filteredUsers.filter((user) =>
+        user.name.toLowerCase().includes(filterValue.toLowerCase())
+      );
+    }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        Array.from(statusFilter).includes(user.status)
+      );
+    }
+
+    return filteredUsers;
+  }, [issues, filterValue, statusFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
+
+  const sortedItems = React.useMemo(() => {
+    return [...items].sort((a: Issue, b: Issue) => {
+      const first = a[sortDescriptor.column as keyof Issue] as number;
+      const second = b[sortDescriptor.column as keyof Issue] as number;
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
+
+  const renderCell = React.useCallback((issue: Issue, columnKey: React.Key) => {
+    const cellValue = issue[columnKey as keyof Issue];
+
+    switch (columnKey) {
+      case "id":
+        return <p className="text-lg">{issue.id}</p>;
+      case "name":
+        return (
+          <div>
+            <p className="text-lg">{issue.name}</p>
+            <p className="text-white/30">{issue.description}</p>
+          </div>
+        );
+      case "status":
+        return (
+          <div className="flex flex-col">
+            <Chip
+              className={` rounded-sm text-lg
+              ${issue.status === "Nowe" ? " bg-blue-600/50 border-2 border-blue-500/70 roudned-sm backdrop-blur-sm" : ""}
+               ${issue.status === "W trakcie" ? " bg-yellow-300/50 border-2 border-yellow-300/70 rounded-sm backdrop-blur-sm" : ""}
+                ${issue.status === "Zakończone" ? " bg-green-600/50 border-2 border-green-500/70 runded-sm backdrop-blur-sm" : ""}
+              `}
+            >
+              {issue.status}
+            </Chip>
+          </div>
+        );
+      case "priority":
+        return (
+          <div>
+            {issue.priority === "Niska" && (
+              <div className="flex flex-row gap-1">
+                <IconWrapper key={issue.id} className=" text-orange-500">
+                  <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                </IconWrapper>
+                <p className="text-lg">P1</p>
+              </div>
+            )}
+            {issue.priority === "Wysoka" && (
+              <div className="flex flex-row gap-1">
+                <IconWrapper key={issue.id} className=" text-orange-700">
+                  <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                </IconWrapper>
+                <p className="text-lg">P2</p>
+              </div>
+            )}
+            {issue.priority === "Średnia" && (
+              <div className="flex flex-row gap-1">
+                <IconWrapper key={issue.id} className=" text-orange-900">
+                  <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                </IconWrapper>
+                <p className="text-lg">P3</p>
+              </div>
+            )}
+          </div>
+        );
+      case "type":
+        return (
+          <div>
+            <p>{issue.type}</p>
+          </div>
+        );
+      case "actions":
+        return (
+          <div className="relative flex justify-end items-center gap-2">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button isIconOnly size="sm" radius="none" variant="light">
+                  <VerticalDotsIcon className="text-default-300" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem key="view">View</DropdownItem>
+                <DropdownItem key="edit">Edit</DropdownItem>
+                <DropdownItem key="delete">Delete</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
+
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    []
+  );
+
+  const onSearchChange = React.useCallback((value?: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
+
+  const topContent = React.useMemo(() => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by name..."
+            startContent={<SearchIcon />}
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  Columns
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {columns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Button color="primary" endContent={<PlusIcon />}>
+              Add New
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
+            Total {issues.length} users
+          </span>
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    );
+  }, [
+    filterValue,
+    statusFilter,
+    visibleColumns,
+    onSearchChange,
+    onRowsPerPageChange,
+    issues.length,
+    hasSearchFilter,
+  ]);
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <span className="w-[30%] text-small text-default-400">
+          {selectedKeys === "all"
+            ? "All items selected"
+            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+        </span>
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+        />
+        <div className="hidden sm:flex w-[30%] justify-end gap-2">
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
   return (
     <div className="w-full  border-1 dark:bg-stone-800">
       <div className="w-full flex flex-col justify-center">
@@ -290,54 +791,51 @@ export default function ProjectPage(projectId: number) {
               </CardBody>
             </Card>
           </Tab>
-          <Tab title="Backlog">
-            <Card>
-              <CardBody>
-                <Listbox
-                  className="p-0 gap-4 divide-y divide-default-300/50 dark:divide-default-100/80 bg-content1 overflow-visible shadow-small rounded-sm"
-                  itemClasses={{
-                    base: "px-5 rounded-none my-1 h-16 data-[hover=true]:bg-default-100/80 ",
+          <Tab title="Backlog" className="rounded-sm ">
+            <Card className="bg-transparent rounded-sm">
+              <CardBody className="bg-transparent">
+                <Table
+                  radius="none"
+                  isHeaderSticky
+                  aria-label="Example table with custom cells, pagination and sorting"
+                  bottomContent={bottomContent}
+                  bottomContentPlacement="outside"
+                  classNames={{
+                    wrapper: "max-h-[382px] min-h-[382px]",
+                    base: ""
                   }}
-                  items={issues}
-                  selectionMode="single"
-                  selectedKeys={backLogSelectedIssue}
-                  onSelectionChange={handleSelectionBackLogSelectedIssue}
+                  selectedKeys={selectedKeys}
+                  selectionMode="multiple"
+                  sortDescriptor={sortDescriptor}
+                  topContent={topContent}
+                  topContentPlacement="outside"
+                  onSelectionChange={setSelectedKeys}
+                  onSortChange={setSortDescriptor}
                 >
-                    {issues.map((issue) => (
-                      <ListboxItem
-                        key={issue.id}
-                        textValue={issue.name}
-                        variant="flat"
-                        // color="warning"
-
-                        className={`rounded-sm text-3xl gap-4 border-2 
-                        ${issue.status === "Nowe" ? "border-primary-400" : ""}
-                        ${issue.status === "Zakończone" ? "border-green-600" : ""}
-                        ${issue.status === "W trakcie" ? "border-yellow-500" : ""}
-
-                        `}
-                        startContent={
-                          <IconWrapper className="bg-success/10 text-success">
-                            <BugIcon className="text-2xl " />
-                          </IconWrapper>
-                        }
+                  <TableHeader columns={headerColumns}>
+                    {(column) => (
+                      <TableColumn
+                        key={column.uid}
+                        align={column.uid === "actions" ? "center" : "start"}
+                        allowsSorting={column.sortable}
                       >
-                        <div className="">
-                          <div className="flex flex-row justify-start gap-2">
-                            <div>
-                              <p className="text-lg">{issue.name}</p>
-                            </div>
-                            <div>
-                              <Chip className={`text-lg
-                                ${issue.status === "Nowe" ? "bg-primary-400" : ""}
-                                ${issue.status === "Zakończone" ? "bg-green-600" : ""}
-                                ${issue.status === "W trakcie" ? "bg-yellow-500" : ""}`}>{issue.status}</Chip>
-                            </div>
-                          </div>
-                        </div>
-                      </ListboxItem>
-                    ))}
-                </Listbox>
+                        {column.name}
+                      </TableColumn>
+                    )}
+                  </TableHeader>
+                  <TableBody
+                    emptyContent={"No users found"}
+                    items={sortedItems}
+                  >
+                    {(item) => (
+                      <TableRow key={item.id}>
+                        {(columnKey) => (
+                          <TableCell>{renderCell(item, columnKey)}</TableCell>
+                        )}
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </CardBody>
             </Card>
           </Tab>
@@ -369,241 +867,5 @@ export default function ProjectPage(projectId: number) {
         </Tabs>
       </div>
     </div>
-
-    // <div className="w-full flex justify-center ">
-    //   <div className="flex bg-zinc-950 w-[100%] justify-center">
-    //     <div className="flex flex-col my-24 w-[100%]">
-    //       <Card
-    //         className="w-full rounded-sm border-1
-    //       border-violet-800 bg-neutral-900"
-    //       >
-    //         <CardBody>
-    //           <div className="flex flex-row w-full">
-    //             <div className="basis-1/3 w-1/3 flex flex-col">
-    //               <p className="text-3xl">Nazwa projektu</p>
-    //               <p className="text-2xl my-4">Opis projektu</p>
-    //               <p className="text-lg my-1">Identyfikator i slowa kluczowe</p>
-    //             </div>
-    //             <div className="basis-1/3 w-1/3 text-white">
-    //               <div className="flex flex-col gap-4">
-    //                 <PieChart
-    //                   className="pieChartCustom text-white fill-current"
-    //                   sx={{
-    //                     "& text": {
-    //                       fill: "#00FF00",
-    //                     },
-    //                   }}
-    //                   series={[
-    //                     {
-    //                       data: [
-    //                         {
-    //                           id: 0,
-    //                           value: 10,
-    //                           label: "TODO",
-    //                           color: "#616161",
-    //                         },
-    //                         {
-    //                           id: 1,
-    //                           value: 15,
-    //                           label: "In progress",
-    //                           color: "#673ab7",
-    //                         },
-    //                         {
-    //                           id: 2,
-    //                           value: 20,
-    //                           label: "Completed",
-    //                           color: "#4caf50",
-    //                         },
-    //                       ],
-    //                     },
-    //                   ]}
-    //                   width={400}
-    //                   height={200}
-    //                 />
-
-    //                 <div>
-    //                   <Progress
-    //                     label="Developers Issues"
-    //                     classNames={{
-    //                       base: "max-w-md",
-    //                       track: "drop-shadow-md border border-default",
-    //                       indicator:
-    //                         "bg-gradient-to-r from-white to-violet-500",
-    //                       label: "tracking-wider font-medium text-default-600",
-    //                       value: "text-foreground/60",
-    //                     }}
-    //                     color="success"
-    //                     showValueLabel={true}
-    //                     size="sm"
-    //                     value={progressDeveloperIssues}
-    //                   />
-    //                   <Progress
-    //                     label="Analisys Issues"
-    //                     classNames={{
-    //                       base: "max-w-md",
-    //                       track: "drop-shadow-md border border-default",
-    //                       indicator: "bg-gradient-to-r from-white to-blue-500",
-    //                       label: "tracking-wider font-medium text-default-600",
-    //                       value: "text-foreground/60",
-    //                     }}
-    //                     color="success"
-    //                     showValueLabel={true}
-    //                     size="sm"
-    //                     value={progressAnalisysIssues}
-    //                   />
-    //                   <Progress
-    //                     label="Code review Issues"
-    //                     classNames={{
-    //                       base: "max-w-md",
-    //                       track: "drop-shadow-md border border-default",
-    //                       indicator:
-    //                         "bg-gradient-to-r from-white to-orange-500",
-    //                       label: "tracking-wider font-medium text-default-600",
-    //                       value: "text-foreground/60",
-    //                     }}
-    //                     color="success"
-    //                     showValueLabel={true}
-    //                     size="sm"
-    //                     value={progressCodeReviewIssues}
-    //                   />
-    //                   <Progress
-    //                     label="Testers Issues"
-    //                     classNames={{
-    //                       base: "max-w-md",
-    //                       track: "drop-shadow-md border border-default",
-    //                       indicator:
-    //                         "bg-gradient-to-r from-white to-yellow-400",
-    //                       label: "tracking-wider font-medium text-default-600",
-    //                       value: "text-foreground/60",
-    //                     }}
-    //                     color="success"
-    //                     showValueLabel={true}
-    //                     size="sm"
-    //                     value={progressTesterIssues}
-    //                   />
-    //                   <Progress
-    //                     label="Completed Issues"
-    //                     classNames={{
-    //                       base: "max-w-md",
-    //                       track: "drop-shadow-md border border-default",
-    //                       indicator: "bg-gradient-to-r from-white to-green-400",
-    //                       label: "",
-    //                       value: "text-foreground/60",
-    //                     }}
-    //                     color="success"
-    //                     showValueLabel={true}
-    //                     size="sm"
-    //                     value={progressCompletedIssues}
-    //                   />
-    //                 </div>
-    //               </div>
-    //             </div>
-    //           </div>
-
-    //           <div className="flex flex-row w-full">
-    //             <div className="basis-1/3 w-1/3">
-    //               <ListboxWrapper>
-    //                 <Listbox
-    //                   classNames={{
-    //                     base: "max-w-lg",
-    //                     list: "max-h-[400px] w-full overflow-scroll",
-    //                   }}
-    //                   defaultSelectedKeys={["1"]}
-    //                   items={users}
-    //                   label="Assigned to"
-    //                   selectionMode="single"
-    //                   //   topContent={}
-    //                   variant="flat"
-    //                   onSelectionChange={setSelectedUser}
-    //                 >
-    //                   {(item) => (
-    //                     <ListboxItem key={item.id} textValue={item.name}>
-    //                       <div className="flex gap-2 items-center">
-    //                         <Avatar
-    //                           key={item.id}
-    //                           alt={item.name}
-    //                           className="flex-shrink-0"
-    //                           size="sm"
-    //                           src={item.image}
-    //                         />
-    //                         <div key={item.id} className="flex flex-col">
-    //                           <span className="text-small">{item.name}</span>
-    //                           <span className="text-tiny text-default-400">
-    //                             {item.email}
-    //                           </span>
-    //                         </div>
-    //                       </div>
-    //                     </ListboxItem>
-    //                   )}
-    //                 </Listbox>
-    //               </ListboxWrapper>
-    //             </div>
-    //             <div className="w-1/3">
-    //               <p>Role</p>
-    //               <Chip
-    //                 className="bg-violet-600 my-2"
-    //                 size="lg"
-    //                 variant="shadow"
-    //               >
-    //                 <p>Developer</p>
-    //               </Chip>
-    //               <p className="my-2">Issues</p>
-    //               <Progress
-    //                 aria-label="Downloading..."
-    //                 className="max-w-md"
-    //                 color="success"
-    //                 showValueLabel={true}
-    //                 size="md"
-    //                 value={progressUserIssues}
-    //               />
-    //               <div className="my-2">
-    //                 <ListboxWrapper>
-    //                   <Listbox
-    //                     classNames={{
-    //                       base: "max-w-lg",
-    //                       list: "max-h-[150px] w-full overflow-scroll",
-    //                     }}
-    //                     defaultSelectedKeys={["1"]}
-    //                     items={issues}
-    //                     label="Assigned to"
-    //                     selectionMode="single"
-    //                     //   topContent={}
-    //                     variant="flat"
-    //                     onSelectionChange={setSelectedUserIssue}
-    //                   >
-    //                     {(item) => (
-    //                       <ListboxItem key={item.id} textValue={item.name}>
-    //                         <div
-    //                           key={item.id}
-    //                           className="flex gap-2 items-center"
-    //                         >
-    //                           <div key={item.id} className="flex flex-col">
-    //                             <span className="text-small">{item.name}</span>
-    //                             <span className="text-tiny text-default-400">
-    //                               {item.name}
-    //                             </span>
-    //                           </div>
-    //                         </div>
-    //                       </ListboxItem>
-    //                     )}
-    //                   </Listbox>
-    //                 </ListboxWrapper>
-    //               </div>
-    //             </div>
-    //             <div className="w-1/3"></div>
-    //           </div>
-    //         </CardBody>
-    //         <CardFooter></CardFooter>
-    //       </Card>
-    //       <Card className="w-[90%] mt-4">
-    //         <CardHeader>
-    //           <h1>Projekt</h1>
-    //         </CardHeader>
-    //         <CardBody></CardBody>
-    //         <CardFooter></CardFooter>
-    //       </Card>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }

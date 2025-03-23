@@ -7,6 +7,7 @@ import type { Selection } from "@react-types/shared";
 import { useEffect, useMemo, useState } from "react";
 import React from "react";
 import NextLink from "next/link";
+import { cn } from "@heroui/theme";
 
 interface project {
   name: string;
@@ -18,7 +19,7 @@ interface project {
 }
 
 interface ProjectResponse {
-  projects: project[]
+  projects: project[];
 }
 
 export default function () {
