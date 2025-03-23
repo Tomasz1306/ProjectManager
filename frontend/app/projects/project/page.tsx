@@ -791,7 +791,7 @@ export default function ProjectPage(projectId: number) {
               </CardBody>
             </Card>
           </Tab>
-          <Tab title="Backlog" className="rounded-sm ">
+          <Tab title="Issues" className="rounded-sm ">
             <Card className="bg-transparent rounded-sm">
               <CardBody className="bg-transparent">
                 <Table

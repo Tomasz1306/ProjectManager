@@ -69,7 +69,7 @@ export default function Home() {
               router.push("/auth/login");
             }
           } else {
-            router.push("/auth/login")
+            router.push("/auth/login");
           }
         })
         .catch((error) => {
@@ -225,10 +225,7 @@ export default function Home() {
 
       <div className="w-full flex flex-col items-center">
         <div className="w-[90%] flex flex-col my-20">
-          <Card
-            className=" rounded-sm 
-        border-1 border-fuchsia-700"
-          >
+          <Card className=" rounded-sm">
             <CardBody>
               <div className="flex flex-row gap-4">
                 <div className="w-1/3">
@@ -258,43 +255,32 @@ export default function Home() {
               </div>
             </CardBody>
           </Card>
-          <div className="flex flex-row justify-between my-6">
-            <Card className="w-[49%] rounded-sm border-1 border-fuchsia-600">
-              <CardHeader>
-                <p className="text-2xl">Issues</p>
-              </CardHeader>
-              <CardBody></CardBody>
-              <CardFooter></CardFooter>
-            </Card>
-            <Card className="w-[49%] rounded-sm border-1 border-fuchsia-600">
-              <CardHeader>
-                <div className="w-full flex flex-row justify-between">
-                  <div className="flex justify-start">
-                    <p className="text-2xl">Projects</p>
+          <div className="flex flex-row justify-between ">
+            <Card className="w-full rounded-sm my-1">
+              <CardBody>
+                <div className="flex flex-row">
+                  <div className="basis-1/3">
+                    <p className="text-2xl">Issues</p>
                   </div>
-
-                  <div className="flex justify-end w-1/3">
-                    {/* <Button
-                      className=" rounded-sm border-1 
-                  border-purple-600 bg-transparent"
-                  onPress={() => handleCreateNewProjectButton()}
-                    >
-                      Create new project
-                    </Button> */}
-                    <div className="flex flex-col gap-4">
-                    <Link href="/projects" size="lg" color="secondary" >
-                      Go to projects
-                    </Link>
-                    <Link href="/projects/create" size="lg" color="secondary">
-                      Create new project
-                    </Link>
+                  <div className="basis-1/3"></div>
+                  <div className="basis-1/3 flex flex-col justify-center">
+                    <div className="flex justify-center">
+                      <p className="text-3xl">Projects</p>
                     </div>
-                    
+                    <div className="flex justify-center my-4">
+                      <Button
+                        variant="light"
+                        className=" bg-purple-800/50 border-purple-500/70
+                      border-1 rounded-sm"
+                        as={Link}
+                        href="/projects"
+                      >
+                        <p className="text-lg">Projects</p>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </CardHeader>
-              <CardBody></CardBody>
-              <CardFooter></CardFooter>
+              </CardBody>
             </Card>
           </div>
         </div>
