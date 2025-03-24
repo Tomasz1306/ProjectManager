@@ -1,3 +1,5 @@
+import { cn } from "@heroui/theme";
+
 export const IconWrapper = ({ children, className }) => (
     <div
       className={cn(
