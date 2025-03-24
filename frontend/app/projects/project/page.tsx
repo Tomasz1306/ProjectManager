@@ -4,7 +4,7 @@ import { SortDescriptor } from "@heroui/react";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Listbox, ListboxSection, ListboxItem } from "@heroui/listbox";
-import { SVGProps, useEffect, useMemo, useState } from "react";
+import { Key, SVGProps, useEffect, useMemo, useState } from "react";
 import React from "react";
 import { Chip, ChipProps } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
@@ -21,6 +21,7 @@ import { Alert } from "@heroui/alert";
 import { cn } from "@heroui/theme";
 import { SharedSelection } from "@heroui/system";
 import { Pagination } from "@heroui/pagination";
+import { Drawer, DrawerContent } from "@heroui/drawer";
 import {
   Dropdown,
   DropdownItem,
@@ -39,6 +40,7 @@ import { User } from "@heroui/user";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { capitalize } from "@mui/material";
+import { useDisclosure } from "@heroui/modal";
 export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-full max-w-[400px] border-1 px-1 py-2 rounded-sm border-violet-600 ">
     {children}
@@ -308,12 +310,22 @@ interface Valid {
 const INITIAL_VISIBLE_COLUMNS = ["id", "name", "status", "priority", "type"];
 
 export default function ProjectPage(projectId: number) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const params = useSearchParams();
   const router = useRouter();
   const [isValidToken, setIsValidToken] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
+  const [selectedIssue, setSeletedIssue] = useState<Issue>();
+
+  function handleOnSelect(id: Selection) {
+    console.log("ID:", id);
+    console.log(id.toString());
+    setSeletedIssue(issues.at(+id.toString()));
+    setSelectedKeys(new Set<Key>([id]));
+    onOpen();
+  }
 
   useEffect(() => {
     async function checkToken() {
@@ -711,160 +723,253 @@ export default function ProjectPage(projectId: number) {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <div className="w-full  border-1 dark:bg-stone-800">
-      <div className="w-full flex flex-col justify-center">
-        <Tabs
-          aria-label="Project"
-          radius="none"
-          variant="underlined"
-          size="lg"
-          className=" border-purple-600 my-2 flex justify-center "
-          color="secondary"
-        >
-          <Tab title="Overview">
-            <p className="text-small text-default-500 mx-3">Project name</p>
-            <p className="text-4xl mx-3">{currentProject?.name}</p>
-            <Card
-              key="Overview"
-              title="Overview"
-              className="bg-transparent my-2"
-              radius="none"
-            >
-              <CardBody>
-                <div className=" flex flex-row">
-                  <div className="basis-1/3">
-                    <p className="text-small text-default-500">Creator info</p>
-                    <div className="flex flex-row justify-start gap-3 my-2">
-                      <EmailOutlinedIcon />
-                      <p>{creator?.email}</p>
-                    </div>
-                    <div className="flex flex-row justify-start gap-3 my-2">
-                      <LocalPhoneOutlinedIcon />
-                      <p>664 334 443</p>
-                    </div>
-                    <div className="flex flex-row justify-start gap-3">
-                      <CalendarMonthOutlinedIcon />
-                      <p>Create date:</p>
-                    </div>
+    <div>
+      <div>
+        <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
+          <DrawerContent>
+            {(onClose) => (
+              <>
+                <div className="flex flex-col">
+                  <div className="flex justify-center">
+                    <p className="text-2xl">{currentProject?.name}</p>
                   </div>
-                  <div className="flex basis-1/3 justify-start">
-                    <div>
-                      <p className="">Status: </p>
+                  <div className="flex flex-col">
+                    <div className="flex justify-center">
+                      <p className="text-white/50 text-sm">ID: </p>
                     </div>
-                  </div>
-                  <div className="basis-1/3">
-                    <p>Last actions</p>
-                    <Listbox className="h-[150px]" variant="light">
-                      <ListboxItem>
-                        <p>Finished task nr 234</p>
-                      </ListboxItem>
-                      <ListboxItem>
-                        <p>Finished task nr 34</p>
-                      </ListboxItem>
-                      <ListboxItem>
-                        <p>Finished task nr 224</p>
-                      </ListboxItem>
-                      <ListboxItem>
-                        <p>Finished task nr 456</p>
-                      </ListboxItem>
-                      <ListboxItem>
-                        <p>Finished task nr 12</p>
-                      </ListboxItem>
-                      <ListboxItem>
-                        <p>Finished task nr 43</p>
-                      </ListboxItem>
-                    </Listbox>
-                  </div>
-                </div>
-                <Divider className="my-2"></Divider>
-                <div className="">
-                  <p className="text-lg">Issues: 15/20</p>
-                  <p className="text-lg">Issues Delayed: 15/20</p>
-                  <p className="text-lg">Budget: 75 000$</p>
-                  <p className="text-lg">Time left: 300h</p>
-                  <p className="text-lg">Time spent: 40h</p>
-                  <p className="text-lg">
-                    Last activity: Issue 4 changed to completed
-                  </p>
-                  <p className="text-lg">Meetings soon</p>
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Issues" className="rounded-sm ">
-            <Card className="bg-transparent rounded-sm">
-              <CardBody className="bg-transparent">
-                <Table
-                  radius="none"
-                  isHeaderSticky
-                  aria-label="Example table with custom cells, pagination and sorting"
-                  bottomContent={bottomContent}
-                  bottomContentPlacement="outside"
-                  classNames={{
-                    wrapper: "max-h-[382px] min-h-[382px]",
-                    base: ""
-                  }}
-                  selectedKeys={selectedKeys}
-                  selectionMode="multiple"
-                  sortDescriptor={sortDescriptor}
-                  topContent={topContent}
-                  topContentPlacement="outside"
-                  onSelectionChange={setSelectedKeys}
-                  onSortChange={setSortDescriptor}
-                >
-                  <TableHeader columns={headerColumns}>
-                    {(column) => (
-                      <TableColumn
-                        key={column.uid}
-                        align={column.uid === "actions" ? "center" : "start"}
-                        allowsSorting={column.sortable}
+                    <div className="flex justify-center">
+                      <p>{selectedIssue?.id}</p>
+                    </div>
+                    <div className="flex justify-center">
+                      <p className="text-white/50 text-sm">Description: </p>
+                    </div>
+                    <div className="flex justify-center">
+                      <p>{selectedIssue?.description}</p>
+                    </div>
+                    <div className="flex justify-center">
+                      <p className="text-white/50 text-sm">Status: </p>
+                    </div>
+                    <div className="flex justify-center">
+                      <Chip
+                        className={` rounded-sm text-lg
+              ${selectedIssue?.status === "Nowe" ? " bg-blue-600/50 border-2 border-blue-500/70 roudned-sm backdrop-blur-sm" : ""}
+               ${selectedIssue?.status === "W trakcie" ? " bg-yellow-300/50 border-2 border-yellow-300/70 rounded-sm backdrop-blur-sm" : ""}
+                ${selectedIssue?.status === "Zakończone" ? " bg-green-600/50 border-2 border-green-500/70 runded-sm backdrop-blur-sm" : ""}
+              `}
                       >
-                        {column.name}
-                      </TableColumn>
-                    )}
-                  </TableHeader>
-                  <TableBody
-                    emptyContent={"No users found"}
-                    items={sortedItems}
-                  >
-                    {(item) => (
-                      <TableRow key={item.id}>
-                        {(columnKey) => (
-                          <TableCell>{renderCell(item, columnKey)}</TableCell>
+                        {selectedIssue?.status}
+                      </Chip>
+                    </div>
+                    <div className="flex justify-center">
+                      <p className="text-white/50 text-sm">Priority: </p>
+                    </div>
+                    <div className="flex justify-center">
+                      <div>
+                        {selectedIssue?.priority === "Niska" && (
+                          <div className="flex flex-row gap-1">
+                            <IconWrapper
+                              key={selectedIssue?.id}
+                              className=" text-orange-500"
+                            >
+                              <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                            </IconWrapper>
+                            <p className="text-lg">P1</p>
+                          </div>
                         )}
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Statistics">
-            <Card>
-              <CardBody></CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Board">
-            <Card>
-              <CardBody></CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Meatings">
-            <Card>
-              <CardBody></CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Discussion">
-            <Card>
-              <CardBody></CardBody>
-            </Card>
-          </Tab>
-          <Tab title="Documentation">
-            <Card>
-              <CardBody></CardBody>
-            </Card>
-          </Tab>
-        </Tabs>
+                        {selectedIssue?.priority === "Wysoka" && (
+                          <div className="flex flex-row gap-1">
+                            <IconWrapper
+                              key={selectedIssue?.id}
+                              className=" text-orange-700"
+                            >
+                              <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                            </IconWrapper>
+                            <p className="text-lg">P2</p>
+                          </div>
+                        )}
+                        {selectedIssue?.priority === "Średnia" && (
+                          <div className="flex flex-row gap-1">
+                            <IconWrapper
+                              key={selectedIssue?.id}
+                              className=" text-orange-900"
+                            >
+                              <HighPriorityIcon className="text-2xl"></HighPriorityIcon>
+                            </IconWrapper>
+                            <p className="text-lg">P3</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <p className="text-white/50 text-sm">Type: </p>
+                    </div>
+                    <div className="flex justify-center">
+                      <p>{selectedIssue?.type}</p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DrawerContent>
+        </Drawer>
+      </div>
+      <div className="w-full  border-1 dark:bg-stone-800">
+        <div className="w-full flex flex-col justify-center">
+          <Tabs
+            aria-label="Project"
+            radius="none"
+            variant="underlined"
+            size="lg"
+            className=" border-purple-600 my-2 flex justify-center "
+            color="secondary"
+          >
+            <Tab title="Overview">
+              <p className="text-small text-default-500 mx-3">Project name</p>
+              <p className="text-4xl mx-3">{currentProject?.name}</p>
+              <Card
+                key="Overview"
+                title="Overview"
+                className="bg-transparent my-2"
+                radius="none"
+              >
+                <CardBody>
+                  <div className=" flex flex-row">
+                    <div className="basis-1/3">
+                      <p className="text-small text-default-500">
+                        Creator info
+                      </p>
+                      <div className="flex flex-row justify-start gap-3 my-2">
+                        <EmailOutlinedIcon />
+                        <p>{creator?.email}</p>
+                      </div>
+                      <div className="flex flex-row justify-start gap-3 my-2">
+                        <LocalPhoneOutlinedIcon />
+                        <p>664 334 443</p>
+                      </div>
+                      <div className="flex flex-row justify-start gap-3">
+                        <CalendarMonthOutlinedIcon />
+                        <p>Create date:</p>
+                      </div>
+                    </div>
+                    <div className="flex basis-1/3 justify-start">
+                      <div>
+                        <p className="">Status: </p>
+                      </div>
+                    </div>
+                    <div className="basis-1/3">
+                      <p>Last actions</p>
+                      <Listbox className="h-[150px]" variant="light">
+                        <ListboxItem>
+                          <p>Finished task nr 234</p>
+                        </ListboxItem>
+                        <ListboxItem>
+                          <p>Finished task nr 34</p>
+                        </ListboxItem>
+                        <ListboxItem>
+                          <p>Finished task nr 224</p>
+                        </ListboxItem>
+                        <ListboxItem>
+                          <p>Finished task nr 456</p>
+                        </ListboxItem>
+                        <ListboxItem>
+                          <p>Finished task nr 12</p>
+                        </ListboxItem>
+                        <ListboxItem>
+                          <p>Finished task nr 43</p>
+                        </ListboxItem>
+                      </Listbox>
+                    </div>
+                  </div>
+                  <Divider className="my-2"></Divider>
+                  <div className="">
+                    <p className="text-lg">Issues: 15/20</p>
+                    <p className="text-lg">Issues Delayed: 15/20</p>
+                    <p className="text-lg">Budget: 75 000$</p>
+                    <p className="text-lg">Time left: 300h</p>
+                    <p className="text-lg">Time spent: 40h</p>
+                    <p className="text-lg">
+                      Last activity: Issue 4 changed to completed
+                    </p>
+                    <p className="text-lg">Meetings soon</p>
+                  </div>
+                </CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Issues" className="rounded-sm ">
+              <Card className="bg-transparent rounded-sm">
+                <CardBody className="bg-transparent">
+                  <Table
+                    radius="none"
+                    isHeaderSticky
+                    aria-label="Example table with custom cells, pagination and sorting"
+                    bottomContent={bottomContent}
+                    bottomContentPlacement="outside"
+                    classNames={{
+                      wrapper: "max-h-[382px] min-h-[382px]",
+                      base: "",
+                    }}
+                    selectedKeys={selectedKeys}
+                    selectionMode="single"
+                    sortDescriptor={sortDescriptor}
+                    topContent={topContent}
+                    topContentPlacement="outside"
+                    onSelectionChange={handleOnSelect}
+                    onSortChange={setSortDescriptor}
+                  >
+                    <TableHeader columns={headerColumns}>
+                      {(column) => (
+                        <TableColumn
+                          key={column.uid}
+                          align={column.uid === "actions" ? "center" : "start"}
+                          allowsSorting={column.sortable}
+                        >
+                          {column.name}
+                        </TableColumn>
+                      )}
+                    </TableHeader>
+                    <TableBody
+                      emptyContent={"No users found"}
+                      items={sortedItems}
+                    >
+                      {(item) => (
+                        <TableRow key={item.id}>
+                          {(columnKey) => (
+                            <TableCell>{renderCell(item, columnKey)}</TableCell>
+                          )}
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Statistics">
+              <Card>
+                <CardBody></CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Board">
+              <Card>
+                <CardBody></CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Meatings">
+              <Card>
+                <CardBody></CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Discussion">
+              <Card>
+                <CardBody></CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Documentation">
+              <Card>
+                <CardBody></CardBody>
+              </Card>
+            </Tab>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
