@@ -21,7 +21,9 @@ import com.projectmanager.backend.entity.Person;
 import com.projectmanager.backend.entity.Project;
 import com.projectmanager.backend.entity.ProjectPerson;
 import com.projectmanager.backend.entity.ProjectPersonId;
+import com.projectmanager.backend.entity.ProjectLog;
 import com.projectmanager.backend.repository.PersonRepository;
+import com.projectmanager.backend.repository.ProjectLogRepository;
 import com.projectmanager.backend.repository.ProjectPersonRepository;
 import com.projectmanager.backend.repository.ProjectRepository;
 
@@ -38,8 +40,12 @@ public class ProjectController {
 
     @Autowired
     private final ProjectRepository projectRepository;
+    @Autowired
     private final PersonRepository personRepository;
+    @Autowired
     private final ProjectPersonRepository projectPersonRepository;
+    @Autowired
+    private final ProjectLogRepository projectLogRepository;
 
     @Data
     @Builder
@@ -79,6 +85,14 @@ public class ProjectController {
         List<Project> projects;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class projectLogsResponse {
+        List<ProjectLog> projectLogs;
+    }
+
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/projects")
@@ -108,26 +122,6 @@ public class ProjectController {
                                     .person(creator)
                                     .project(project)
                                     .build();
-    }
-
-    @GetMapping(path = "/project", params = "description")
-    List<Project> getProjectByDescritpion(String description) {
-        return projectRepository.findByDescription(description);
-    }
-
-    @GetMapping(path = "/project", params = "startdate")
-    List<Project> getProjectByStartDate(Instant startDate) {
-        return projectRepository.findByStartdate(startDate);
-    }
-
-    @GetMapping(path = "/project", params = "duedate")
-    List<Project> getProjectByDueDate(Instant duedate) {
-        return projectRepository.findByDuedate(duedate);
-    }
-
-    @GetMapping(path = "/project", params = "createid")
-    List<Project> getProjectByName(Integer createid) {
-        return projectRepository.findByCreatorid(createid);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
@@ -213,6 +207,15 @@ public class ProjectController {
                 .status(true)
                 .projectName(request.name)
                 .build();
+    }
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping(path = "/projectLogs/{id}")
+    List<ProjectLog> getProjectLogs(@PathVariable("id") Integer projectId) {
+        Optional<Project> project = projectRepository.findById(projectId);
+        if (project.isPresent()) {
+            return projectLogRepository.findByProjectid_Id(project.get().getId());
+        }
+        return new ArrayList<>();
     }
 }

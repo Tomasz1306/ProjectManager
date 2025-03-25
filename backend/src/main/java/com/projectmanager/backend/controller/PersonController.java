@@ -75,6 +75,8 @@ public class PersonController {
     @PostMapping(path = "/findPerson")
     List<Person> findPersonByEmailKey(@RequestBody PersonRequest key) {
         // System.console().printf(key.email);
-        return repository.findByEmailStartingWith(key.email);        
+        List<Person> findedPersons = repository.findByEmailStartingWith(key.email);      
+        System.out.println(findedPersons);
+        return findedPersons;
     }
 }

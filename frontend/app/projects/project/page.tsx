@@ -57,6 +57,17 @@ interface Valid {
   valid: boolean;
 }
 
+interface ProjectLog {
+  id: number;
+  description: string;
+  projectlogdate: Date;
+  projectid: number;
+}
+
+interface ProjectLogResponse {
+  projectLogs: ProjectLog[];
+}
+
 export default function ProjectPage(projectId: number) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const params = useSearchParams();
@@ -66,6 +77,7 @@ export default function ProjectPage(projectId: number) {
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
   const [selectedIssue, setSeletedIssue] = useState<Issue>();
+  const [projectLogs, setProjectLogs] = useState<ProjectLog[]>([]);
 
 
   useEffect(() => {
@@ -103,6 +115,24 @@ export default function ProjectPage(projectId: number) {
     }
     checkToken();
   }, []);
+
+  useEffect(() => {
+    async function fetchProjectLogs () {
+      const response = await fetch(`http://localhost:8080/api/v1/projectLogs/${params.get("projectId")}`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      if (response.ok) {
+        const jsonResponse: ProjectLogResponse = await response.json();
+        console.log(jsonResponse);
+        setProjectLogs(jsonResponse.projectLogs);
+        console.log(projectLogs);
+      }
+    }
+    fetchProjectLogs();
+  }, [projectLogs])
 
   useEffect(() => {
     async function fetchProject() {
@@ -145,21 +175,23 @@ export default function ProjectPage(projectId: number) {
     }
     fetchProjectIssues();
   }, []);
+
+  
   return (
     <div>
-      <div className="w-full  border-1 dark:bg-stone-800">
+      <div className="w-full border-1 dark:bg-gray-950">
         <div className="w-full flex flex-col justify-center">
           <Tabs
             aria-label="Project"
             radius="none"
             variant="underlined"
             size="lg"
-            className=" border-purple-600 my-2 flex justify-center "
+            className="my-2 flex justify-center"
             color="secondary"
           >
             <Tab title="Overview">
               <p className="text-small text-default-500 mx-3">Project name</p>
-              <p className="text-4xl mx-3">{currentProject?.name}</p>
+              <p className="text-4xl mx-3">{currentProject?.name} {projectLogs?.at(0)?.id}</p>
               <Card
                 key="Overview"
                 title="Overview"
@@ -175,6 +207,8 @@ export default function ProjectPage(projectId: number) {
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <EmailOutlinedIcon />
                         <p>{creator?.email}</p>
+                        <p>{projectLogs?.length}</p>
+                      
                       </div>
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <LocalPhoneOutlinedIcon />
@@ -191,27 +225,13 @@ export default function ProjectPage(projectId: number) {
                       </div>
                     </div>
                     <div className="basis-1/3">
-                      <p>Last actions</p>
-                      <Listbox className="h-[150px]" variant="light">
-                        <ListboxItem>
-                          <p>Finished task nr 234</p>
-                        </ListboxItem>
-                        <ListboxItem>
-                          <p>Finished task nr 34</p>
-                        </ListboxItem>
-                        <ListboxItem>
-                          <p>Finished task nr 224</p>
-                        </ListboxItem>
-                        <ListboxItem>
-                          <p>Finished task nr 456</p>
-                        </ListboxItem>
-                        <ListboxItem>
-                          <p>Finished task nr 12</p>
-                        </ListboxItem>
-                        <ListboxItem>
-                          <p>Finished task nr 43</p>
-                        </ListboxItem>
-                      </Listbox>
+                    <p>{projectLogs?.length}</p>
+                    {projectLogs?.map((projectLog) => (
+                        <div>
+                          <p>{projectLog.description}</p>
+                        </div>
+                      ))}
+                      
                     </div>
                   </div>
                   <Divider className="my-2"></Divider>
