@@ -1,9 +1,15 @@
 "use client";
-import { useDisclosure } from "@heroui/react";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Avatar,
+  Button,
+  useDisclosure,
+} from "@heroui/react";
 import { Card, CardBody } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Listbox, ListboxItem } from "@heroui/listbox";
-import { useEffect, useState } from "react";
+import { Key, SyntheticEvent, useEffect, useState } from "react";
 import React from "react";
 import { Chip } from "@heroui/chip";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,6 +29,8 @@ interface Person {
   emailVerified: Date;
   image: string;
   createDate: Date;
+  role: string;
+  projectRole: string;
 }
 
 interface Issue {
@@ -67,6 +75,20 @@ interface ProjectLogResponse {
   projectLogs: ProjectLog[];
 }
 
+interface ProjectPerson {
+  personid: Person;
+  role: string;
+}
+
+interface PeopleResponse {
+  people: ProjectPerson[];
+}
+
+interface AddPersonResponse {
+  status: boolean;
+  person: ProjectPerson;
+}
+
 export default function ProjectPage(projectId: number) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const params = useSearchParams();
@@ -76,8 +98,45 @@ export default function ProjectPage(projectId: number) {
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<Person>();
   const [selectedIssue, setSeletedIssue] = useState<Issue>();
+  const [people, setPeople] = useState<ProjectPerson[]>([]);
   const [projectLogs, setProjectLogs] = useState<ProjectLog[]>([]);
+  const [searchPeople, setSearchPeople] = useState("");
+  const [findedPeople, setFindedPeople] = useState<Person[]>([]);
+  const [selectedPersonToAdd, setSelectedPersonToAdd] = useState("");
 
+  function selectedPerson(key: Key | null) {
+    if (key !== null) {
+      setSelectedPersonToAdd(key.toString());
+    }
+  }
+
+  async function addPersonToProject() {
+    if (selectedPersonToAdd.length === 0) {
+      return;
+    }
+    const response = await fetch(
+      `http://localhost:8080/api/v1/project/addPerson`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: selectedPersonToAdd,
+          projectId: params.get("projectId"),
+        }),
+      }
+    );
+    if (response.ok) {
+      const jsonResponse: AddPersonResponse = await response.json();
+      console.log(jsonResponse);
+      if (jsonResponse.status === true) {
+        console.log(jsonResponse);
+        setPeople([...people, jsonResponse.person]);
+      }
+    }
+  }
 
   useEffect(() => {
     async function checkToken() {
@@ -116,13 +175,39 @@ export default function ProjectPage(projectId: number) {
   }, []);
 
   useEffect(() => {
-    async function fetchProjectLogs () {
-      const response = await fetch(`http://localhost:8080/api/v1/projectLogs/${params.get("projectId")}`, {
-        method: "GET",
+    if (searchPeople.length === 0) {
+      setFindedPeople(Array());
+      return;
+    }
+    async function fetchSearchingPeople() {
+      const response = await fetch(`http://localhost:8080/api/v1/findPerson`, {
+        method: "POST",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({ email: searchPeople }),
       });
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        console.log(jsonResponse);
+        setFindedPeople(jsonResponse);
+      }
+    }
+    fetchSearchingPeople();
+  }, [searchPeople]);
+
+  useEffect(() => {
+    async function fetchProjectLogs() {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/projectLogs/${params.get("projectId")}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       if (response.ok) {
         const jsonResponse: ProjectLogResponse = await response.json();
         console.log(jsonResponse);
@@ -130,7 +215,26 @@ export default function ProjectPage(projectId: number) {
       }
     }
     fetchProjectLogs();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    async function fetchPeople() {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/projectPeople/${params.get("projectId")}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (response.ok) {
+        const jsonResponse: PeopleResponse = await response.json();
+        setPeople(jsonResponse.people);
+      }
+    }
+    fetchPeople();
+  }, []);
 
   useEffect(() => {
     async function fetchProject() {
@@ -174,7 +278,6 @@ export default function ProjectPage(projectId: number) {
     fetchProjectIssues();
   }, []);
 
-  
   return (
     <div>
       <div className="w-full border-1 dark:bg-gray-950">
@@ -189,6 +292,7 @@ export default function ProjectPage(projectId: number) {
           >
             <Tab title="Overview">
               <p className="text-small text-default-500 mx-3">Project name</p>
+              <p className="text-3xl1 mx-3">{currentProject?.name}</p>
               <Card
                 key="Overview"
                 title="Overview"
@@ -204,7 +308,6 @@ export default function ProjectPage(projectId: number) {
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <EmailOutlinedIcon />
                         <p>{creator?.email}</p>
-                      
                       </div>
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <LocalPhoneOutlinedIcon />
@@ -221,15 +324,143 @@ export default function ProjectPage(projectId: number) {
                       </div>
                     </div>
                     <div className="basis-1/3">
-                    <p>{projectLogs?.length}</p>
-                    {projectLogs?.map((projectLog) => (
+                      <p>{projectLogs?.length}</p>
+                      {projectLogs?.map((projectLog) => (
                         <div key={projectLog.id}>
                           <p key={projectLog.id}>{projectLog.description}</p>
                         </div>
                       ))}
-                      
                     </div>
                   </div>
+                  <Divider className="my-2"></Divider>
+                  <div>
+                    <p className="text-2xl">People</p>
+                    <div className="flex flex-row gap-4 w-[40%]">
+                      <Autocomplete
+                        label="Find by email"
+                        radius="none"
+                        className=" border-1 bg-transparent "
+                        defaultItems={findedPeople}
+                        inputValue={searchPeople}
+                        onSelectionChange={(e) => selectedPerson(e)}
+                        onInputChange={(e) => setSearchPeople(e)}
+                      >
+                        {(person) => (
+                          <AutocompleteItem
+                            className="rounded-none border-1 border-white/50"
+                            variant="light"
+                            key={person.email}
+                            textValue={person.email}
+                            // textValue={person.name}
+                          >
+                            <div className="flex flex-row justify-between">
+                              <div className="flex flex-row gap-4">
+                                <div>
+                                  <Avatar></Avatar>
+                                </div>
+                                <div>
+                                  <p> {person.name}</p>
+                                  <p> {person.email}</p>
+                                </div>
+                                <div></div>
+                              </div>
+                            </div>
+                          </AutocompleteItem>
+                        )}
+                      </Autocomplete>
+                      <div className="flex flex-col justify-center">
+                        <Button
+                          variant="light"
+                          radius="none"
+                          className="border-1"
+                          onPress={(e) => addPersonToProject()}
+                        >
+                          {" "}
+                          ADD{" "}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Listbox
+                      // classNames={{
+                      //   base: "max-w-xs",
+                      //   list: "max-h-[300px] overflow-scroll",
+                      // }}
+                      className="w-[40%] max-h-[150px] my-2 overflow-scroll"
+                      items={people}
+                    >
+                      {(person) => (
+                        <ListboxItem
+                          key={person.personid.id}
+                          className=" rounded-sm"
+                        >
+                          <div className="flex flex-row items-center gap-4 justify-between">
+                            <div className="w-full flex flex-row gap-2 justify-between">
+                              <div className="basis-[10%]">
+                                <Avatar></Avatar>
+                              </div>
+
+                              <div className="basis-[60%] flex flex-col justify-center">
+                                {person.personid.name.length >= 16 && (
+                                  <p className="text-lg">
+                                    {person.personid.name.slice(0, 16)}...
+                                  </p>
+                                )}
+                                {person.personid.name.length < 18 && (
+                                  <p className="text-lg">
+                                    {person.personid.name}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="basis-[30%] flex flex-col justify-center">
+                                {person.role === "MEMBER" && (
+                                  <div className="">
+                                    <Chip variant="light" color="success">
+                                      <p className="text-lg">MEMBER</p>
+                                    </Chip>
+                                  </div>
+                                )}
+                                {person.role === "ADMIN" && (
+                                  <div>
+                                    <Chip variant="light" color="warning">
+                                      <p className="text-lg">ADMIN</p>
+                                    </Chip>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {person.role === "MEMBER" && (
+                              <div className="flex justify-end">
+                                <Button
+                                  variant="light"
+                                  color="danger"
+                                  radius="none"
+                                  className="border-1"
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            )}
+                            {person.role === "ADMIN" && (
+                              <div className="flex justify-end">
+                                <Button
+                                  variant="light"
+                                  color="danger"
+                                  radius="none"
+                                  className="border-1"
+                                  isDisabled
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </ListboxItem>
+                      )}
+                    </Listbox>
+                  </div>
+
                   <Divider className="my-2"></Divider>
                   <div className="">
                     <p className="text-lg">Issues: 15/20</p>

@@ -33,9 +33,11 @@ public class ProjectPerson {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "projectid", nullable = false)
-    // @JsonManagedReference
-    // @JsonIgnore
     private Project projectid;
+
+
+    @Column(name = "role", nullable = false)
+    private String role;
 
     public ProjectPersonId getId() {
         return id;
