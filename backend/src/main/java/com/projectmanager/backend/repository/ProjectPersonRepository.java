@@ -3,9 +3,10 @@ package com.projectmanager.backend.repository;
 import com.projectmanager.backend.entity.ProjectPerson;
 import com.projectmanager.backend.entity.ProjectPersonId;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectPersonRepository extends JpaRepository<ProjectPerson, ProjectPersonId> {
 
@@ -13,6 +14,8 @@ public interface ProjectPersonRepository extends JpaRepository<ProjectPerson, Pr
 
     List<ProjectPerson> findById_Personid(Integer personid);
 
-    @Query("select pp from ProjectPerson pp join fetch pp.personid join fetch pp.projectid where pp.id.projectid = :projectid")
-    List<ProjectPerson> findByProjectIdWithDetails(@Param("projectid") Integer projectid);
+    Optional<ProjectPerson> findById_ProjectidAndId_Personid(Integer projectid, Integer personid);
+
+    @Transactional
+    void deleteById_ProjectidAndId_Personid(Integer projectid, Integer personid);
 }

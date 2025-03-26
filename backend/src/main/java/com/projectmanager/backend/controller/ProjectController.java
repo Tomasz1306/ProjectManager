@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -119,6 +120,24 @@ public class ProjectController {
     private static class addPersonRequest {
         String email;
         Integer projectId;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class deletePersonResponse {
+        boolean status;
+        Person deletedPerson;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class deletePersonRequest {
+        Integer projectId;
+        Integer personId;
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
@@ -255,10 +274,11 @@ public class ProjectController {
         List<ProjectPerson> projectPersons = projectPersonRepository.findById_Projectid(projectid);
         // List<Person> people = new LinkedList<>();
         // for (int i = 0; i < projectPersons.size(); i++) {
-        //     Optional<Person> person = personRepository.findById(projectPersons.get(i).getPersonid().getId());
-        //     if (person.isPresent()) {
-        //         people.add(person.get());
-        //     }
+        // Optional<Person> person =
+        // personRepository.findById(projectPersons.get(i).getPersonid().getId());
+        // if (person.isPresent()) {
+        // people.add(person.get());
+        // }
         // }
         return peopleResponse.builder().people(projectPersons).build();
     }
@@ -285,4 +305,19 @@ public class ProjectController {
         }
         return addPersonResponse.builder().status(false).build();
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping("/project/deletePerson")
+    @Transactional
+    deletePersonResponse deletePerson(@RequestBody deletePersonRequest request) {
+        Optional<Person> person = personRepository.findById(request.personId);
+        projectPersonRepository.deleteById_ProjectidAndId_Personid(request.projectId, request.personId);
+        Optional<ProjectPerson> projectPersonCheck = projectPersonRepository
+                .findById_ProjectidAndId_Personid(request.projectId, request.personId);
+        if (projectPersonCheck.isEmpty()) {
+            return deletePersonResponse.builder().status(true).deletedPerson(person.get()).build();
+        }
+        return deletePersonResponse.builder().status(false).build();
+    }
+
 }

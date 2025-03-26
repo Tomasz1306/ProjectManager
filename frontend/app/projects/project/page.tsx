@@ -89,6 +89,11 @@ interface AddPersonResponse {
   person: ProjectPerson;
 }
 
+interface DeleteResponse {
+  status: boolean;
+  person: Person;
+}
+
 export default function ProjectPage(projectId: number) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const params = useSearchParams();
@@ -135,6 +140,23 @@ export default function ProjectPage(projectId: number) {
         console.log(jsonResponse);
         setPeople([...people, jsonResponse.person]);
       }
+    }
+  }
+
+  async function deletePersonFromProject(personId: number) {
+    const response = await fetch (`http://localhost:8080/api/v1/project/deletePerson`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({projectId: params.get("projectId"), personId: personId})
+    })
+    if (response.ok) {
+      const jsonResponse: DeleteResponse = await response.json();
+      if (jsonResponse.status) {
+        console.log("PERSONE DELETED FROM PROJECT");
+      } 
     }
   }
 
@@ -375,8 +397,7 @@ export default function ProjectPage(projectId: number) {
                           className="border-1"
                           onPress={(e) => addPersonToProject()}
                         >
-                          {" "}
-                          ADD{" "}
+                          ADD
                         </Button>
                       </div>
                     </div>
@@ -437,6 +458,8 @@ export default function ProjectPage(projectId: number) {
                                   color="danger"
                                   radius="none"
                                   className="border-1"
+                                  key={person.personid.id}
+                                  onPress={(e) => deletePersonFromProject(person.personid.id)}
                                 >
                                   Delete
                                 </Button>
