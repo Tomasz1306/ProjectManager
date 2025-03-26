@@ -61,7 +61,6 @@ interface ProjectLog {
   id: number;
   description: string;
   projectlogdate: Date;
-  projectid: number;
 }
 
 interface ProjectLogResponse {
@@ -128,11 +127,10 @@ export default function ProjectPage(projectId: number) {
         const jsonResponse: ProjectLogResponse = await response.json();
         console.log(jsonResponse);
         setProjectLogs(jsonResponse.projectLogs);
-        console.log(projectLogs);
       }
     }
     fetchProjectLogs();
-  }, [projectLogs])
+  }, [])
 
   useEffect(() => {
     async function fetchProject() {
@@ -266,7 +264,7 @@ export default function ProjectPage(projectId: number) {
                 <CardBody></CardBody>
               </Card>
             </Tab>
-            <Tab title="Meatings">
+            <Tab title="Meetings">
               <Card>
                 <CardBody></CardBody>
               </Card>

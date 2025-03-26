@@ -105,13 +105,12 @@ export default function LoginPage() {
       });
       if (response.ok) {
         const jsonResponse = await response.json();
+        console.log(jsonResponse);
         setPeople(jsonResponse);
       }
     };
     fetchPeople();
   }, [search]);
-
-  function handleCreate() {}
 
   return (
     <div>
@@ -126,7 +125,7 @@ export default function LoginPage() {
         classNames={{
           body: "py-6",
           backdrop: "bg-[#292f46]/50",
-          base: "rounded-sm border-1 border-[#292f46] border-purple-600 bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
+          base: "rounded-sm border-1 border-[#292f46] border-purple-600 bg-[#19172c] dark:bg-gray-950 text-[#a8b0d3]",
           // header: "border-b-[1px] border-[#292f46]",
           // footer: "border-t-[1px] border-[#292f46]",
           // closeButton: "hover:bg-white/5 active:bg-white/10",
@@ -193,7 +192,7 @@ export default function LoginPage() {
                     >
                       {people.map((person) => (
                         <AutocompleteItem key={person.id}>
-                          {person.name}
+                          {person.email}
                         </AutocompleteItem>
                       ))}
                     </Autocomplete>
