@@ -211,11 +211,12 @@ public class ProjectController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path = "/projectLogs/{id}")
-    List<ProjectLog> getProjectLogs(@PathVariable("id") Integer projectId) {
+    projectLogsResponse getProjectLogs(@PathVariable("id") Integer projectId) {
         Optional<Project> project = projectRepository.findById(projectId);
         if (project.isPresent()) {
-            return projectLogRepository.findByProjectid_Id(project.get().getId());
+            List<ProjectLog> projectLogs = projectLogRepository.findByProjectid_Id(project.get().getId());
+            return projectLogsResponse.builder().projectLogs(projectLogs).build();
         }
-        return new ArrayList<>();
+        return projectLogsResponse.builder().build();
     }
 }
