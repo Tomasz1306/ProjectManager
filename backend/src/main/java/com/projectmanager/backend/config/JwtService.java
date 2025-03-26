@@ -22,7 +22,8 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     @Value("${SECRET_KEY}")
-    private  String SECRET_KEY;
+    private String secretKey;
+
     private List<String> blackList = new ArrayList<String>();
 
     public boolean isTokenOnBlackList(String token) {
@@ -81,7 +82,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
