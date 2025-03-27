@@ -1,13 +1,11 @@
 package com.projectmanager.backend.controller;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,22 +34,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ProjectController {
 
-    @Autowired
     private final ProjectRepository projectRepository;
-    @Autowired
     private final PersonRepository personRepository;
-    @Autowired
     private final ProjectPersonRepository projectPersonRepository;
-    @Autowired
     private final ProjectLogRepository projectLogRepository;
-    @Autowired
     private final PositionRepository positionRepository;
 
     @Data
@@ -70,7 +62,7 @@ public class ProjectController {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class createProjectResponse {
+    private static class CreateProjectResponse {
         boolean status;
         String projectName;
     }
@@ -79,7 +71,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class completeProjectResponse {
+    private static class CompleteProjectResponse {
         Optional<Project> project;
         Optional<Person> person;
     }
@@ -88,7 +80,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class projectsResponse {
+    private static class ProjectsResponse {
         List<Project> projects;
     }
 
@@ -96,7 +88,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class projectLogsResponse {
+    private static class ProjectLogsResponse {
         List<ProjectLog> projectLogs;
     }
 
@@ -115,7 +107,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class peopleResponse {
+    private static class PeopleResponse {
         List<ProjectPerson> people;
         List<PositionInfo> positions;
     }
@@ -124,7 +116,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class addPersonResponse {
+    private static class AddPersonResponse {
         boolean status;
         ProjectPerson person;
     }
@@ -133,7 +125,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class addPersonRequest {
+    private static class AddPersonRequest {
         String email;
         Integer projectId;
     }
@@ -142,7 +134,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class deletePersonResponse {
+    private static class DeletePersonResponse {
         boolean status;
         Person deletedPerson;
     }
@@ -151,7 +143,7 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class deletePersonRequest {
+    private static class DeletePersonRequest {
         String deleteCallerEmail;
         Integer projectId;
         Integer personId;
@@ -172,17 +164,17 @@ public class ProjectController {
     @SuppressWarnings("preview")
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/completeProject/{id}")
-    completeProjectResponse getCompleteProject(@PathVariable("id") Integer projectid) {
+    CompleteProjectResponse getCompleteProject(@PathVariable("id") Integer projectid) {
         Optional<Project> project = projectRepository.findById(projectid);
         if (project.isEmpty()) {
-            return completeProjectResponse.builder().build();
+            return CompleteProjectResponse.builder().build();
         }
         Optional<Person> creator = personRepository.findById(project.get().getCreatorid());
         if (creator.isEmpty()) {
-            return completeProjectResponse.builder().build();
+            return CompleteProjectResponse.builder().build();
         }
         // ADD REST OF PROJECT INFORMATION LIKE ISSUES LOGS ECT...
-        return completeProjectResponse.builder()
+        return CompleteProjectResponse.builder()
                 .person(creator)
                 .project(project)
                 .build();
@@ -197,17 +189,15 @@ public class ProjectController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
-
     }
 
     @JsonIgnore
     @SuppressWarnings("preview")
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path = "/projects", params = "email")
-    projectsResponse getProjectsByCreatorId(String email) {
+    ProjectsResponse getProjectsByCreatorId(String email) {
         Person person = personRepository.findByEmail(email);
         List<ProjectPerson> projectPerson = projectPersonRepository.findById_Personid(person.getId());
-        // System.out.println(projectPerson.get(0).getProjectid().getId());
         List<Optional<Project>> optionalProjects = new ArrayList<>();
         for (int i = 0; i < projectPerson.size(); i++) {
             optionalProjects.add(projectRepository.findById(projectPerson.get(i).getProjectid().getId()));
@@ -221,16 +211,16 @@ public class ProjectController {
             }
         }
         System.out.println(projects.getFirst());
-        return projectsResponse.builder().projects(projects).build();
+        return ProjectsResponse.builder().projects(projects).build();
     }
 
     @SuppressWarnings("preview")
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(path = "/createProject")
-    createProjectResponse createProject(@RequestBody createProjectRequest request) {
+    CreateProjectResponse createProject(@RequestBody createProjectRequest request) {
         if (!projectRepository.findByName(request.name).isEmpty()) {
             System.console().printf("Project with that name exists: ");
-            return createProjectResponse.builder()
+            return CreateProjectResponse.builder()
                     .status(false)
                     .projectName(request.name).build();
         }
@@ -243,12 +233,6 @@ public class ProjectController {
                 .status(request.status)
                 .build();
         Project savedProject = projectRepository.save(project);
-        if (savedProject == null) {
-            System.console().printf("Cannot save project");
-            return createProjectResponse.builder()
-                    .status(false)
-                    .projectName(request.name).build();
-        }
         ProjectPersonId projectPersonId = ProjectPersonId.builder()
                 .personid(person.getId())
                 .projectid(project.getId())
@@ -261,14 +245,8 @@ public class ProjectController {
                 .role("ADMIN")
                 .build();
         ProjectPerson savedProjectPerson = projectPersonRepository.save(projectPerson);
-        if (savedProjectPerson == null) {
-            System.console().printf("Cannot save project/person");
-            return createProjectResponse.builder()
-                    .status(false)
-                    .projectName(request.name).build();
-        }
 
-        return createProjectResponse.builder()
+        return CreateProjectResponse.builder()
                 .status(true)
                 .projectName(request.name)
                 .build();
@@ -276,27 +254,19 @@ public class ProjectController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path = "/projectLogs/{id}")
-    projectLogsResponse getProjectLogs(@PathVariable("id") Integer projectId) {
+    ProjectLogsResponse getProjectLogs(@PathVariable("id") Integer projectId) {
         Optional<Project> project = projectRepository.findById(projectId);
         if (project.isPresent()) {
             List<ProjectLog> projectLogs = projectLogRepository.findByProjectid_Id(project.get().getId());
-            return projectLogsResponse.builder().projectLogs(projectLogs).build();
+            return ProjectLogsResponse.builder().projectLogs(projectLogs).build();
         }
-        return projectLogsResponse.builder().build();
+        return ProjectLogsResponse.builder().build();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/projectPeople/{id}")
-    peopleResponse getMethodName(@PathVariable("id") Integer projectid) {
+    PeopleResponse getMethodName(@PathVariable("id") Integer projectid) {
         List<ProjectPerson> projectPersons = projectPersonRepository.findById_Projectid(projectid);
-        // List<Person> people = new LinkedList<>();
-        // for (int i = 0; i < projectPersons.size(); i++) {
-        // Optional<Person> person =
-        // personRepository.findById(projectPersons.get(i).getPersonid().getId());
-        // if (person.isPresent()) {
-        // people.add(person.get());
-        // }
-        // }
         List<PositionInfo> positions = new LinkedList<>();
         for (int i = 0; i < projectPersons.size(); i++) {
             List<Position> position = positionRepository.findByProjectPersonid(projectPersons.get(i));
@@ -313,12 +283,12 @@ public class ProjectController {
             }
             positions.addAll(positionsInfo);
         }
-        return peopleResponse.builder().people(projectPersons).positions(positions).build();
+        return PeopleResponse.builder().people(projectPersons).positions(positions).build();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/project/addPerson")
-    addPersonResponse addPersonToProject(@RequestBody addPersonRequest request) {
+    AddPersonResponse addPersonToProject(@RequestBody AddPersonRequest request) {
         Person person = personRepository.findByEmail(request.email);
         Optional<Project> project = projectRepository.findById(request.projectId);
         ProjectPersonId newProjectPersonId = ProjectPersonId
@@ -333,16 +303,13 @@ public class ProjectController {
                 .id(newProjectPersonId)
                 .build();
         ProjectPerson addedProjectPerson = projectPersonRepository.save(newProjectPerson);
-        if (addedProjectPerson != null) {
-            return addPersonResponse.builder().status(true).person(addedProjectPerson).build();
-        }
-        return addPersonResponse.builder().status(false).build();
+        return AddPersonResponse.builder().status(true).person(addedProjectPerson).build();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping("/project/deletePerson")
     @Transactional
-    deletePersonResponse deletePerson(@RequestBody deletePersonRequest request) {
+    DeletePersonResponse deletePerson(@RequestBody DeletePersonRequest request) {
         Person personDeleteCaller = personRepository.findByEmail(request.deleteCallerEmail);
         Optional<Project> currentProject = projectRepository.findById(request.projectId);
         Optional<Person> personToDelete = personRepository.findById(request.personId);
@@ -360,9 +327,9 @@ public class ProjectController {
             Optional<ProjectPerson> projectPersonCheck = projectPersonRepository
                     .findById_ProjectidAndId_Personid(request.projectId, request.personId);
             if (projectPersonCheck.isEmpty()) {
-                return deletePersonResponse.builder().status(true).deletedPerson(personToDelete.get()).build();
+                return DeletePersonResponse.builder().status(true).deletedPerson(personToDelete.get()).build();
             }
         }
-        return deletePersonResponse.builder().status(false).build();
+        return DeletePersonResponse.builder().status(false).build();
     }
 }
