@@ -136,6 +136,7 @@ public class ProjectController {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class deletePersonRequest {
+        String deleteCallerEmail;
         Integer projectId;
         Integer personId;
     }
@@ -310,14 +311,21 @@ public class ProjectController {
     @DeleteMapping("/project/deletePerson")
     @Transactional
     deletePersonResponse deletePerson(@RequestBody deletePersonRequest request) {
+        Person personDeleteCaller = personRepository.findByEmail(request.deleteCallerEmail);
+        Optional<Project> currentProject = projectRepository.findById(request.projectId);
         Optional<Person> person = personRepository.findById(request.personId);
-        projectPersonRepository.deleteById_ProjectidAndId_Personid(request.projectId, request.personId);
-        Optional<ProjectPerson> projectPersonCheck = projectPersonRepository
-                .findById_ProjectidAndId_Personid(request.projectId, request.personId);
-        if (projectPersonCheck.isEmpty()) {
-            return deletePersonResponse.builder().status(true).deletedPerson(person.get()).build();
+        Optional<ProjectPerson> projectPersonDeleteCaller = projectPersonRepository
+                .findById_ProjectidAndId_Personid(request.projectId, personDeleteCaller.getId());
+                
+        if (personDeleteCaller.getId() == currentProject.get().getCreatorid()
+                || projectPersonDeleteCaller.get().getRole().equals("ADMIN")) {
+            projectPersonRepository.deleteById_ProjectidAndId_Personid(request.projectId, request.personId);
+            Optional<ProjectPerson> projectPersonCheck = projectPersonRepository
+                    .findById_ProjectidAndId_Personid(request.projectId, request.personId);
+            if (projectPersonCheck.isEmpty()) {
+                return deletePersonResponse.builder().status(true).deletedPerson(person.get()).build();
+            }
         }
         return deletePersonResponse.builder().status(false).build();
     }
-
 }

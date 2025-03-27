@@ -4,6 +4,10 @@ import {
   AutocompleteItem,
   Avatar,
   Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
   useDisclosure,
 } from "@heroui/react";
 import { Card, CardBody } from "@heroui/card";
@@ -139,24 +143,31 @@ export default function ProjectPage(projectId: number) {
       if (jsonResponse.status === true) {
         console.log(jsonResponse);
         setPeople([...people, jsonResponse.person]);
+        setSearchPeople("");
       }
     }
   }
 
   async function deletePersonFromProject(personId: number) {
-    const response = await fetch (`http://localhost:8080/api/v1/project/deletePerson`, {
-      method: "DELETE",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({projectId: params.get("projectId"), personId: personId})
-    })
+    const response = await fetch(
+      `http://localhost:8080/api/v1/project/deletePerson`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          deleteCallerEmail: localStorage.getItem("email"),
+          projectId: params.get("projectId"),
+          personId: personId,
+        }),
+      }
+    );
     if (response.ok) {
       const jsonResponse: DeleteResponse = await response.json();
       if (jsonResponse.status) {
-        console.log("PERSONE DELETED FROM PROJECT");
-      } 
+      }
     }
   }
 
@@ -256,7 +267,7 @@ export default function ProjectPage(projectId: number) {
       }
     }
     fetchPeople();
-  }, []);
+  }, [deletePersonFromProject]);
 
   useEffect(() => {
     async function fetchProject() {
@@ -302,6 +313,58 @@ export default function ProjectPage(projectId: number) {
 
   return (
     <div>
+      <Modal
+
+      size="2xl"
+      className="h-[200px]"
+      isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+            <div className="flex justify-center">
+            <ModalHeader>
+              <p className="text-lg">Add Person</p>
+            </ModalHeader>
+            </div>
+              <ModalBody>
+                <Autocomplete
+                  label="Find by email"
+                  radius="none"
+                  className=" border-1 bg-transparent "
+                  defaultItems={findedPeople}
+                  inputValue={searchPeople}
+                  onSelectionChange={(e) => selectedPerson(e)}
+                  onInputChange={(e) => setSearchPeople(e)}
+                >
+                  {(person) => (
+                    <AutocompleteItem
+                      className="rounded-none border-1 border-white/50"
+                      variant="light"
+                      key={person.email}
+                      textValue={person.email}
+                      // textValue={person.name}
+                    >
+                      <div className="flex flex-row justify-between">
+                        <div className="flex flex-row gap-4">
+                          <div>
+                            <Avatar></Avatar>
+                          </div>
+                          <div>
+                            <p> {person.name}</p>
+                            <p> {person.email}</p>
+                          </div>
+                          <div></div>
+                        </div>
+                      </div>
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
+                <Button onPress={() => addPersonToProject()}>ADD</Button>
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <div className="w-full border-1 dark:bg-gray-950">
         <div className="w-full flex flex-col justify-center">
           <Tabs
@@ -357,49 +420,17 @@ export default function ProjectPage(projectId: number) {
                   <Divider className="my-2"></Divider>
                   <div>
                     <p className="text-2xl">People</p>
-                    <div className="flex flex-row gap-4 w-[40%]">
-                      <Autocomplete
-                        label="Find by email"
+                    <div className="flex flex-row gap-4 w-[40%] ">
+                      <Button
+                        variant="light"
                         radius="none"
-                        className=" border-1 bg-transparent "
-                        defaultItems={findedPeople}
-                        inputValue={searchPeople}
-                        onSelectionChange={(e) => selectedPerson(e)}
-                        onInputChange={(e) => setSearchPeople(e)}
+                        color="success"
+                        size="lg"
+                        className="w-full border-1 border-green-400 "
+                        onPress={onOpen}
                       >
-                        {(person) => (
-                          <AutocompleteItem
-                            className="rounded-none border-1 border-white/50"
-                            variant="light"
-                            key={person.email}
-                            textValue={person.email}
-                            // textValue={person.name}
-                          >
-                            <div className="flex flex-row justify-between">
-                              <div className="flex flex-row gap-4">
-                                <div>
-                                  <Avatar></Avatar>
-                                </div>
-                                <div>
-                                  <p> {person.name}</p>
-                                  <p> {person.email}</p>
-                                </div>
-                                <div></div>
-                              </div>
-                            </div>
-                          </AutocompleteItem>
-                        )}
-                      </Autocomplete>
-                      <div className="flex flex-col justify-center">
-                        <Button
-                          variant="light"
-                          radius="none"
-                          className="border-1"
-                          onPress={(e) => addPersonToProject()}
-                        >
-                          ADD
-                        </Button>
-                      </div>
+                        ADD
+                      </Button>
                     </div>
 
                     <Listbox
@@ -409,11 +440,14 @@ export default function ProjectPage(projectId: number) {
                       // }}
                       className="w-[40%] max-h-[150px] my-2 overflow-scroll"
                       items={people}
+                      aria-label="peopleList"
                     >
                       {(person) => (
                         <ListboxItem
                           key={person.personid.id}
                           className=" rounded-sm"
+                          textValue={person.personid.name}
+                          aria-label={person.personid.name}
                         >
                           <div className="flex flex-row items-center gap-4 justify-between">
                             <div className="w-full flex flex-row gap-2 justify-between">
@@ -423,14 +457,20 @@ export default function ProjectPage(projectId: number) {
 
                               <div className="basis-[60%] flex flex-col justify-center">
                                 {person.personid.name.length >= 16 && (
+                                  <div>
                                   <p className="text-lg">
                                     {person.personid.name.slice(0, 16)}...
                                   </p>
+                                  <p className="text-white/50">{person.personid.email}</p>
+                                  </div>
                                 )}
                                 {person.personid.name.length < 18 && (
+                                  <div>
                                   <p className="text-lg">
                                     {person.personid.name}
                                   </p>
+                                  <p className="text-white/50">{person.personid.email}</p>
+                                  </div>
                                 )}
                               </div>
                               <div className="basis-[30%] flex flex-col justify-center">
@@ -459,7 +499,9 @@ export default function ProjectPage(projectId: number) {
                                   radius="none"
                                   className="border-1"
                                   key={person.personid.id}
-                                  onPress={(e) => deletePersonFromProject(person.personid.id)}
+                                  onPress={(e) =>
+                                    deletePersonFromProject(person.personid.id)
+                                  }
                                 >
                                   Delete
                                 </Button>
