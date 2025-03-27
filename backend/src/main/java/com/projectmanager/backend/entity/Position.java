@@ -1,11 +1,6 @@
 package com.projectmanager.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,5 +19,12 @@ public class Position {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY ,optional = false)
+    @JoinColumns({
+        @JoinColumn(name = "projectid", referencedColumnName = "projectid"),
+        @JoinColumn(name = "personid", referencedColumnName = "personid")
+    })
+    private ProjectPerson projectPersonid;
     
 }

@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projectmanager.backend.entity.Person;
+import com.projectmanager.backend.entity.Position;
 import com.projectmanager.backend.entity.Project;
 import com.projectmanager.backend.entity.ProjectPerson;
 import com.projectmanager.backend.entity.ProjectPersonId;
 import com.projectmanager.backend.entity.ProjectLog;
 import com.projectmanager.backend.repository.PersonRepository;
+import com.projectmanager.backend.repository.PositionRepository;
 import com.projectmanager.backend.repository.ProjectLogRepository;
 import com.projectmanager.backend.repository.ProjectPersonRepository;
 import com.projectmanager.backend.repository.ProjectRepository;
@@ -49,6 +51,8 @@ public class ProjectController {
     private final ProjectPersonRepository projectPersonRepository;
     @Autowired
     private final ProjectLogRepository projectLogRepository;
+    @Autowired
+    private final PositionRepository positionRepository;
 
     @Data
     @Builder
@@ -100,8 +104,20 @@ public class ProjectController {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    private static class PositionInfo {
+        Integer id;
+        Integer personid;
+        Integer projectid;
+        String name;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class peopleResponse {
         List<ProjectPerson> people;
+        List<PositionInfo> positions;
     }
 
     @Data
@@ -281,7 +297,23 @@ public class ProjectController {
         // people.add(person.get());
         // }
         // }
-        return peopleResponse.builder().people(projectPersons).build();
+        List<PositionInfo> positions = new LinkedList<>();
+        for (int i = 0; i < projectPersons.size(); i++) {
+            List<Position> position = positionRepository.findByProjectPersonid(projectPersons.get(i));
+            List<PositionInfo> positionsInfo = new LinkedList<>();
+            for (int j = 0; j < position.size(); j++) {
+                PositionInfo positionInfo = PositionInfo
+                .builder()
+                .id(position.get(j).getId())
+                .name(position.get(j).getName())
+                .personid(position.get(j).getProjectPersonid().getPersonid().getId())
+                .projectid(position.get(j).getProjectPersonid().getProjectid().getId())
+                .build();
+                positionsInfo.add(positionInfo);
+            }
+            positions.addAll(positionsInfo);
+        }
+        return peopleResponse.builder().people(projectPersons).positions(positions).build();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
@@ -313,17 +345,22 @@ public class ProjectController {
     deletePersonResponse deletePerson(@RequestBody deletePersonRequest request) {
         Person personDeleteCaller = personRepository.findByEmail(request.deleteCallerEmail);
         Optional<Project> currentProject = projectRepository.findById(request.projectId);
-        Optional<Person> person = personRepository.findById(request.personId);
+        Optional<Person> personToDelete = personRepository.findById(request.personId);
         Optional<ProjectPerson> projectPersonDeleteCaller = projectPersonRepository
                 .findById_ProjectidAndId_Personid(request.projectId, personDeleteCaller.getId());
-                
+        Optional<ProjectPerson> projectPersonToDelete = projectPersonRepository.findById_ProjectidAndId_Personid(request.projectId, request.personId);
+        List<Position> positions = positionRepository.findByProjectPersonid(projectPersonToDelete.get());
+        for (int i = positions.size() -1 ; i >= 0 ; i--) {
+            positionRepository.deleteById(positions.get(i).getId());
+        } 
+
         if (personDeleteCaller.getId() == currentProject.get().getCreatorid()
                 || projectPersonDeleteCaller.get().getRole().equals("ADMIN")) {
             projectPersonRepository.deleteById_ProjectidAndId_Personid(request.projectId, request.personId);
             Optional<ProjectPerson> projectPersonCheck = projectPersonRepository
                     .findById_ProjectidAndId_Personid(request.projectId, request.personId);
             if (projectPersonCheck.isEmpty()) {
-                return deletePersonResponse.builder().status(true).deletedPerson(person.get()).build();
+                return deletePersonResponse.builder().status(true).deletedPerson(personToDelete.get()).build();
             }
         }
         return deletePersonResponse.builder().status(false).build();
