@@ -128,7 +128,11 @@ export default function ProjectPage(projectId: number) {
     console.log("HALO");
     console.log(keys);
     setSelectedPersonId(new Set(keys));
-    setSeletedPerson(people.find((person) => person.personid.id === Number(keys.keys().next().value)));
+    setSeletedPerson(
+      people.find(
+        (person) => person.personid.id === Number(keys.keys().next().value)
+      )
+    );
   }
 
   function handleSelectedPersonToAdd(key: Key | null) {
@@ -282,7 +286,7 @@ export default function ProjectPage(projectId: number) {
       );
       if (response.ok) {
         const jsonResponse: PeopleResponse = await response.json();
-        console.log(jsonResponse)
+        console.log(jsonResponse);
         const people = jsonResponse.people;
         console.log("PEOPLE: ", people);
 
@@ -503,17 +507,17 @@ export default function ProjectPage(projectId: number) {
                                 </div>
 
                                 <div className="basis-[60%] flex flex-col justify-center">
-                                  {person.personid.name.length >= 16 && (
+                                  {person.personid.name.length >= 15 && (
                                     <div>
                                       <p className="text-lg">
-                                        {person.personid.name.slice(0, 16)}...
+                                        {person.personid.name.slice(0, 15)}...
                                       </p>
                                       <p className="text-white/50">
                                         {person.personid.email}
                                       </p>
                                     </div>
                                   )}
-                                  {person.personid.name.length < 18 && (
+                                  {person.personid.name.length < 15 && (
                                     <div>
                                       <p className="text-lg">
                                         {person.personid.name}
@@ -580,18 +584,22 @@ export default function ProjectPage(projectId: number) {
                     </div>
 
                     <div className="w-[60%] border-1">
-                      {selectedPerson && 
-                        <div>
-                          <p>{selectedPerson.personid.name}</p>
+                      {selectedPerson && (
+                        <div className="">
+                          <p className="text-lg">
+                            {selectedPerson.personid.name}
+                          </p>
                           <p>{selectedPerson.personid.email}</p>
                           <p>{selectedPerson.role}</p>
-                          {selectedPerson?.positions.map((position) => (
-                            <div key={position.id}>
-                                <Button key={position.id}>{position.name}</Button>
+                          <div className="flex">
+                            {selectedPerson?.positions.map((position) => (
+                              <div key={position.id}>
+                                <Chip key={position.id}>{position.name}</Chip>
                               </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                        }
+                      )}
                     </div>
                   </div>
 
