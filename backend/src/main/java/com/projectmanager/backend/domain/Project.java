@@ -27,7 +27,7 @@ public class Project {
     @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(name = "description")
