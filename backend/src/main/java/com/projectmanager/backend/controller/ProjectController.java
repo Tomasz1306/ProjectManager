@@ -1,10 +1,8 @@
 package com.projectmanager.backend.controller;
 
-import com.projectmanager.backend.domain.Project;
+import com.projectmanager.backend.service.ProjectUserService;
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,27 +16,19 @@ import com.projectmanager.backend.dto.response.ProjectDeleteResponseDTO;
 import com.projectmanager.backend.dto.response.ProjectIdResponseDTO;
 import com.projectmanager.backend.dto.response.ProjectsResponseDTO;
 import com.projectmanager.backend.dto.request.ProjectCreateRequestDTO;
-import com.projectmanager.backend.repository.ProjectUserRepository;
-import com.projectmanager.backend.repository.ProjectRepository;
-import com.projectmanager.backend.repository.UserRepository;
-import com.projectmanager.backend.service.ProjectService;
-
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController("ProjectController")
 @Validated
 @RequestMapping("api/v1/projects")
 public class ProjectController {
 
-    private final ProjectService projectService;
+    private final ProjectUserService projectService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectUserService projectService) {
         this.projectService = projectService;
     }
 
@@ -48,7 +38,7 @@ public class ProjectController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProjectIdResponseDTO> getMethodName(@PathVariable Long projectId) {
         ProjectIdResponseDTO response = projectService.getProjectById(projectId);
         return new ResponseEntity<>(response, HttpStatus.OK);

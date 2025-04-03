@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import com.projectmanager.backend.domain.ProjectUser;
+import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.repository.ProjectUserRepository;
 import com.projectmanager.backend.repository.UserRepository;
 import org.slf4j.LoggerFactory;
@@ -18,8 +20,8 @@ import com.projectmanager.backend.dto.response.ProjectIdResponseDTO;
 import com.projectmanager.backend.dto.response.ProjectsResponseDTO;
 import com.projectmanager.backend.repository.ProjectRepository;
 
-@Service("ProjectService")
-public class ProjectService {
+@Service("ProjectUserService")
+public class ProjectUserService {
 
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
@@ -27,6 +29,7 @@ public class ProjectService {
 
     public ProjectCreateResponseDTO createProject(ProjectCreateRequestDTO request) {
         Optional<Project> project = projectRepository.findByName(request.getName());
+        Optional<User> user = userRepository.findById(request.getCreatorId());
         if (project.isPresent()) {
             return ProjectCreateResponseDTO
                     .builder()
@@ -34,12 +37,26 @@ public class ProjectService {
                     .status(false)
                     .build();
         }
+        if (user.isEmpty()) {
+            return ProjectCreateResponseDTO
+            .builder()
+            .information("User not exists")
+            .status(false)
+            .build();
+        }
         Project newProject = Project.builder().name(request.getName()).description(request.getDescription()).build();
         Project createdProject = projectRepository.save(newProject);
-        return ProjectCreateResponseDTO.builder().information("Successful").status(false).projectId(newProject.getId()).build();
+        ProjectUser newProjectUser = ProjectUser
+            .builder()
+            .project(createdProject)
+            .user(user.get())
+            .build();
+        projectUserRepository.save(newProjectUser);
+        return ProjectCreateResponseDTO.builder().information("Successfully").status(true).projectId(createdProject.getId()).build();
     }
 
-    public ProjectService(UserRepository userRepository, ProjectRepository projectRepository, ProjectUserRepository projectUserRepository) {
+    public ProjectUserService(UserRepository userRepository, ProjectRepository projectRepository,
+            ProjectUserRepository projectUserRepository) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.projectUserRepository = projectUserRepository;
@@ -52,7 +69,7 @@ public class ProjectService {
         }
         return ProjectIdResponseDTO.builder().build();
     }
-    
+
     public ProjectsResponseDTO getProjects() {
         List<Project> projects = projectRepository.findAll();
         return ProjectsResponseDTO.builder().projects(projects).build();
@@ -65,6 +82,6 @@ public class ProjectService {
         }
         Long id = projectToDelete.get().getId();
         projectRepository.delete(projectToDelete.get());
-        return ProjectDeleteResponseDTO.builder().information("Successful").status(true).projectId(id).build();
+        return ProjectDeleteResponseDTO.builder().information("Successfully").status(true).projectId(id).build();
     }
 }
