@@ -48,6 +48,7 @@ public class ProjectController {
     @GetMapping()
     public ResponseEntity<ProjectsResponseDTO> getProjects() {
         ProjectsResponseDTO response = projectService.getProjects();
+        System.out.println("RESPONSE: " + response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

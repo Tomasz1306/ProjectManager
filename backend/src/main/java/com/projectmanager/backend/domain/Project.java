@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Collate;
@@ -37,5 +38,6 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude
+    @JsonIgnore
     private List<ProjectUser> projectUsers = new ArrayList<>();
 }

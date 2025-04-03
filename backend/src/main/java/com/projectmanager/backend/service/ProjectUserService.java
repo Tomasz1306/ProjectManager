@@ -74,6 +74,7 @@ public class ProjectUserService {
 
     public ProjectsResponseDTO getProjects() {
         List<Project> projects = projectRepository.findAll();
+        System.out.println("Projects found: " + projects);
         return ProjectsResponseDTO.builder().projects(projects).build();
     }
 
