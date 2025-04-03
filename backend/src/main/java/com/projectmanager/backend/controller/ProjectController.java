@@ -1,5 +1,6 @@
 package com.projectmanager.backend.controller;
 
+import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.service.ProjectUserService;
 import jakarta.validation.Valid;
 
@@ -50,9 +51,9 @@ public class ProjectController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ProjectDeleteResponseDTO> deleteProject(@Valid @PathVariable Long projectId) {
-        ProjectDeleteResponseDTO response = projectService.deleteProject(projectId);
+    @PostMapping("/delete")
+    public ResponseEntity<ProjectDeleteResponseDTO> deleteProject(@Valid @RequestBody ProjectDeleteRequestDTO request) {
+        ProjectDeleteResponseDTO response = projectService.deleteProject(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     

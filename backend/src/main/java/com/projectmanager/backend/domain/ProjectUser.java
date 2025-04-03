@@ -3,11 +3,9 @@ package com.projectmanager.backend.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 //Lombok annotations//
 @Data
@@ -26,17 +24,17 @@ public class ProjectUser {
     @Column(name = "id", nullable = false, unique = true)
     private long id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
     @Column(name = "isOwner")
     private Boolean isOwner;
 
-    @OneToMany(mappedBy = "projectUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "projectUser")
     private List<ProjectUserIssue> projectUserIssues = new ArrayList<>();
 }

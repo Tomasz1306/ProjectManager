@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import com.projectmanager.backend.domain.ProjectUser;
 import com.projectmanager.backend.domain.User;
+import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.repository.ProjectUserRepository;
 import com.projectmanager.backend.repository.UserRepository;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class ProjectUserService {
             .builder()
             .project(createdProject)
             .user(user.get())
+            .isOwner(true)
             .build();
         projectUserRepository.save(newProjectUser);
         return ProjectCreateResponseDTO.builder().information("Successfully").status(true).projectId(createdProject.getId()).build();
@@ -75,13 +77,26 @@ public class ProjectUserService {
         return ProjectsResponseDTO.builder().projects(projects).build();
     }
 
-    public ProjectDeleteResponseDTO deleteProject(Long projectId) {
-        Optional<Project> projectToDelete = projectRepository.findById(projectId);
+    public ProjectDeleteResponseDTO deleteProject(ProjectDeleteRequestDTO request) {
+        Optional<Project> projectToDelete = projectRepository.findById(request.getProjectId());
+        Optional<User> user = userRepository.findById(request.getUserId());
+        if (user.isEmpty()) {
+            return ProjectDeleteResponseDTO.builder().information("Wrong user id").build();
+        }
         if (projectToDelete.isEmpty()) {
             return ProjectDeleteResponseDTO.builder().information("Project not exists").status(false).build();
         }
+        Optional<ProjectUser> projectUser = projectUserRepository.findByProjectAndUser(projectToDelete.get(), user.get());
+        System.out.println(projectUser.get());
+        if (projectUser.isEmpty()) {
+            return ProjectDeleteResponseDTO.builder().information("User is assigned to project").status(false).build();
+        }
+        if (!projectUser.get().getIsOwner()) {
+            return ProjectDeleteResponseDTO.builder().information("User is not a owner of project").status(false).build();
+        }
         Long id = projectToDelete.get().getId();
-        projectRepository.delete(projectToDelete.get());
+        projectUserRepository.delete(projectUser.get());
+        projectRepository.delete(projectUser.get().getProject());
         return ProjectDeleteResponseDTO.builder().information("Successfully").status(true).projectId(id).build();
     }
 }

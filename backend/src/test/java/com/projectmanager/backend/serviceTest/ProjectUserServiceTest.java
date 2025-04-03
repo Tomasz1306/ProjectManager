@@ -3,6 +3,7 @@ package com.projectmanager.backend.serviceTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.dto.response.ProjectDeleteResponseDTO;
 import com.projectmanager.backend.dto.response.ProjectIdResponseDTO;
 import com.projectmanager.backend.dto.response.ProjectsResponseDTO;
@@ -150,8 +151,33 @@ public class ProjectUserServiceTest {
                 .description("description 1")
                 .build();
 
+        User user = User
+                .builder()
+                .id(1L)
+                .name("tomasz")
+                .username("tbogdan")
+                .email("tomasz@example.com")
+                .password("password")
+                .build();
+
+        ProjectUser projectUser = ProjectUser
+                .builder()
+                .id(1L)
+                .project(project)
+                .user(user)
+                .isOwner(true)
+                .build();
+
+        ProjectDeleteRequestDTO projectDeleteRequestDTO = ProjectDeleteRequestDTO
+                .builder()
+                .projectId(1L)
+                .userId(1L)
+                .build();
+
         Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-        ProjectDeleteResponseDTO projectDeleteResponseDTO = projectService.deleteProject(1L);
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        Mockito.when(projectUserRepository.findByProjectAndUser(project, user)).thenReturn(Optional.of(projectUser));
+        ProjectDeleteResponseDTO projectDeleteResponseDTO = projectService.deleteProject(projectDeleteRequestDTO);
 
         assertEquals(1L, projectDeleteResponseDTO.getProjectId());
         assertEquals(true, projectDeleteResponseDTO.getStatus());
