@@ -4,13 +4,10 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.Collate;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 //Lombok annotations//
 @Data
@@ -27,7 +24,7 @@ public class Project {
     @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(name = "description")
@@ -39,6 +36,8 @@ public class Project {
     @Column(name = "dueDate")
     private Date dueDate;
 
-    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    @JsonIgnore
     private List<ProjectUser> projectUsers = new ArrayList<>();
 }
