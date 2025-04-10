@@ -1,9 +1,11 @@
 import { title } from "@/components/primitives";
+import MyTableComponent from "@/components/table/MyTableIssueComponent";
+
 
 export default function PricingPage() {
   return (
-    <div>
-      <h1 className={title()}>Pricing</h1>
+    <div className="w-full h-full">
+      <MyTableComponent></MyTableComponent>
     </div>
   );
 }

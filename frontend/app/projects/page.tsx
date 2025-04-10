@@ -100,11 +100,11 @@ export default function () {
         </Button>
       </div>
 
-      <div className="flex bg-zinc-950 w-[100%] justify-center my-2">
+      <div className="flex w-[100%] justify-center my-2">
         <div className="w-full flex flex-col gap-4">
           {projects.map((project) => (
             <div key={project.id} className="w-full border-1">
-              <Card key={project.id} className="bg-stone-950">
+              <Card key={project.id} className="dark:bg-gray-950">
                 <CardBody key={project.id}>
                   <div className="flex flex-row gap-4 justify-between ">
                     <div className="">

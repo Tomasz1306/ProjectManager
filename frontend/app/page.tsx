@@ -111,7 +111,7 @@ export default function Home() {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         size="4xl"
-        className=" rounded-sm"
+        className=" rounded-sm dark:bg-slate-900"
         backdrop="blur"
       >
         <ModalContent>

@@ -180,7 +180,7 @@ export default function LoginPage() {
                     >
                       {people.map((person) => (
                         <AutocompleteItem key={person.id}>
-                          {person.name}
+                          {person.email}
                         </AutocompleteItem>
                       ))}
                     </Autocomplete>
