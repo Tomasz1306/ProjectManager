@@ -52,6 +52,7 @@ export default function LoginPage() {
       localStorage.setItem("token", json.token);
       localStorage.setItem("email", credentials.email);
       localStorage.setItem("name", json.name);
+      localStorage.setItem("id", json.id);
       addToast({
         title: "Hi, you'e logged correctly",
         description: "Please rewrite your credentials",

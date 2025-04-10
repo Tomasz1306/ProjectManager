@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Collate;
@@ -15,6 +16,7 @@ import org.hibernate.annotations.Collate;
 @NoArgsConstructor
 @AllArgsConstructor
 //******************//
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 @Entity
 @Table(name = "project")

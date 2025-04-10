@@ -1,5 +1,6 @@
 package com.projectmanager.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 import com.projectmanager.backend.domain.ProjectUser;
 import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
+import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.repository.ProjectUserRepository;
 import com.projectmanager.backend.repository.UserRepository;
 import org.slf4j.LoggerFactory;
@@ -15,10 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.projectmanager.backend.domain.Project;
 import com.projectmanager.backend.dto.request.ProjectCreateRequestDTO;
-import com.projectmanager.backend.dto.response.ProjectCreateResponseDTO;
-import com.projectmanager.backend.dto.response.ProjectDeleteResponseDTO;
-import com.projectmanager.backend.dto.response.ProjectIdResponseDTO;
-import com.projectmanager.backend.dto.response.ProjectsResponseDTO;
 import com.projectmanager.backend.repository.ProjectRepository;
 
 @Service("ProjectUserService")
@@ -74,7 +72,34 @@ public class ProjectUserService {
 
     public ProjectsResponseDTO getProjects() {
         List<Project> projects = projectRepository.findAll();
-        System.out.println("Projects found: " + projects);
+        return ProjectsResponseDTO.builder().projects(projects).build();
+    }
+
+    public ProjectUserResponseDTO getUserProject(Long userId, Long projectId) {
+        Project project = projectRepository.findById(projectId).get();
+        User user = userRepository.findById(userId).get();
+        Optional<ProjectUser> projectUser = projectUserRepository.findByProjectAndUser(project, user);
+
+        if (projectUser.isPresent()) {
+            return ProjectUserResponseDTO
+                    .builder()
+                    .projectUser(projectUser.get())
+                    .build();
+        }
+        return ProjectUserResponseDTO.builder().build();
+    }
+
+    public ProjectsResponseDTO getUserProjects(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        List<ProjectUser> projectUsers = projectUserRepository.findByUser(user.get());
+        List<Project> projects = new ArrayList<>();
+        for (var projectUser: projectUsers) {
+            Optional<Project> project = projectRepository.findById(projectUser.getProject().getId());
+            if (project.isPresent()) {
+                projects.add(project.get());
+            }
+        }
+        System.out.println("User Projects found: " + projects);
         return ProjectsResponseDTO.builder().projects(projects).build();
     }
 

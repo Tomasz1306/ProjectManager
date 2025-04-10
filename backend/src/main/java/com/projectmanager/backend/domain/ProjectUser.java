@@ -14,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 // **************** //
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 @Entity
 @Table(name = "project_user")
