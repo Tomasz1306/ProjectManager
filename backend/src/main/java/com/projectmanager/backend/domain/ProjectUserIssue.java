@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class ProjectUserIssue {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_USER_ISSUE_SEQUENCE")
-    @SequenceGenerator(name = "PROJECT_USER_ISSUE_SEQUENCE", sequenceName = "project_user_issue_sequence")
+    @SequenceGenerator(name = "PROJECT_USER_ISSUE_SEQUENCE", sequenceName = "project_user_issue_sequence", allocationSize = 1, initialValue = 1)
     private Long id;
     
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

@@ -55,7 +55,7 @@ export interface ProjectUserIssue {
   issue: Issue;
 }
 
-export interface CreateProjectResponseDTO {
+export interface ProjectCreateResponseDTO {
   projectId: number;
   status: boolean;
   information: string;
@@ -92,4 +92,12 @@ export interface CheckTokenResponse {
 
 export interface ProjectUserResponseDTO {
   projectUser: ProjectUser;
+}
+
+export interface UserFindByEmailKeyRequestDTO {
+  key: string;
+}
+
+export interface UserFindByEmailKeyResponseDTO {
+  users: User[];
 }

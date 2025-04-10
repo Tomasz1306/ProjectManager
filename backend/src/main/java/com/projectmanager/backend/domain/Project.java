@@ -23,7 +23,7 @@ import org.hibernate.annotations.Collate;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_SEQUENCE")
-    @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence")
+    @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence", allocationSize = 1, initialValue = 1)
     private Long id;
 
     @Column(name = "name", unique = true)

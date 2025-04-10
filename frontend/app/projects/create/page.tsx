@@ -22,27 +22,18 @@ import { Link } from "@heroui/link";
 import { Accordion, AccordionItem } from "@heroui/accordion";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 
-interface Credential {
-  email: string;
-  password: string;
-}
-
-interface Person {
-  email: string;
-  name: string;
-  surname: string;
-  id: number;
-}
-
-interface createProjectResponse {
-  status: boolean;
-  name: string;
-}
+import {
+  ProjectCreateRequestDTO,
+  ProjectCreateResponseDTO,
+  User,
+  UserFindByEmailKeyResponseDTO,
+  UserFindByEmailKeyRequestDTO,
+} from "@/types/types"
 
 export default function LoginPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [people, setPeople] = useState<Person[]>([]);
+  const [people, setPeople] = useState<User[]>([]);
   const [projectStatus, setProjectStatus] = useState('IN PROGRESS');
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
@@ -51,22 +42,22 @@ export default function LoginPage() {
   });
 
   async function handleCreateProject() {
-    const response = await fetch("http://localhost:8080/api/v1/createProject", {
+    const projectCreateRequestDTO: ProjectCreateRequestDTO = {
+      creatorId: Number(localStorage.getItem("id")),
+      name: projectName,
+      description: projectDescription,
+    }
+    const response = await fetch("http://localhost:8080/api/v1/projects/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
-      body: JSON.stringify({
-        email: localStorage.getItem("email"),
-        name: projectName,
-        description: projectDescription,
-        status: projectStatus,
-      }),
+      body: JSON.stringify(projectCreateRequestDTO),
     });
 
     if (response.ok) {
-      const jsonResponse: createProjectResponse = await response.json();
+      const jsonResponse: ProjectCreateResponseDTO = await response.json();
       console.log(jsonResponse);
       if (jsonResponse.status) {
         addToast({
@@ -95,23 +86,22 @@ export default function LoginPage() {
       return;
     }
     const fetchPeople = async () => {
-      const response = await fetch("http://localhost:8080/api/v1/findPerson", {
+      const response = await fetch("http://localhost:8080/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
-        body: JSON.stringify({ email: search }),
+        body: JSON.stringify({ key: search }),
       });
       if (response.ok) {
-        const jsonResponse = await response.json();
-        setPeople(jsonResponse);
+        const userFindByEmailKeyResponse = await response.json();
+        console.log(userFindByEmailKeyResponse.users);
+        setPeople(userFindByEmailKeyResponse.users);
       }
     };
     fetchPeople();
   }, [search]);
-
-  function handleCreate() {}
 
   return (
     <div>
@@ -127,9 +117,6 @@ export default function LoginPage() {
           body: "py-6",
           backdrop: "bg-[#292f46]/50",
           base: "rounded-sm border-1 border-[#292f46] border-purple-600 bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
-          // header: "border-b-[1px] border-[#292f46]",
-          // footer: "border-t-[1px] border-[#292f46]",
-          // closeButton: "hover:bg-white/5 active:bg-white/10",
         }}
       >
         <ModalContent>

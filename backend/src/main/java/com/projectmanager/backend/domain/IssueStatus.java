@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class IssueStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ISSUE_STATUS_SEQUENCE")
-    @SequenceGenerator(name = "ISSUE_STATUS_SEQUENCE", sequenceName = "issue_status_sequence")
+    @SequenceGenerator(name = "ISSUE_STATUS_SEQUENCE", sequenceName = "issue_status_sequence", allocationSize = 1, initialValue = 1)
     private Long id;
 
     @Column(name = "name")
