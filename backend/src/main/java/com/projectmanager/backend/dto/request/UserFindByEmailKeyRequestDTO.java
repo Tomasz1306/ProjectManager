@@ -1,16 +1,17 @@
-package com.projectmanager.backend.auth;
+package com.projectmanager.backend.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//Lombok annotations//
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
-    private String email;
-    private String token;
-    private Long id;
+// **************** //
+
+public class UserFindByEmailKeyRequestDTO {
+    private String key;
 }

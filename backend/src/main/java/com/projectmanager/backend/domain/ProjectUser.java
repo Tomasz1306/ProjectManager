@@ -14,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 // **************** //
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 @Entity
 @Table(name = "project_user")
@@ -21,7 +22,7 @@ public class ProjectUser {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_USER_SEQUENCE")
-    @SequenceGenerator(name = "PROJECT_USER_SEQUENCE", sequenceName = "project_user_sequence")
+    @SequenceGenerator(name = "PROJECT_USER_SEQUENCE", sequenceName = "project_user_sequence", allocationSize = 1, initialValue = 1)
     @Column(name = "id", nullable = false, unique = true)
     private long id;
 

@@ -8,24 +8,24 @@ import { useEffect, useMemo, useState } from "react";
 import React from "react";
 import NextLink from "next/link";
 import { cn } from "@heroui/theme";
+import {
+  ProjectDeleteRequestDTO,
+  ProjectCreateRequestDTO,
+  ProjectDeleteResponseDTO,
+  ProjectsResponseDTO, Project,
+} from "@/types/types";
 
-interface project {
-  name: string;
-  description: string;
-  creatorid: number;
-  id: number;
-  duedate: string;
-  status: string;
-}
-
-interface ProjectResponse {
-  projects: project[];
-}
-
+// eslint-disable-next-line react/display-name
 export default function () {
-  const [projects, setProjects] = useState<project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   async function handleDeleteProject(projectId: number) {
+
+    const projectDeleteRequestDTO: ProjectDeleteRequestDTO = {
+      projectId: projectId,
+      userId: Number(localStorage.getItem("id")),
+    }
+
     const response = await fetch(
       "http://localhost:8080/api/v1/deleteProject/" + projectId,
       {
@@ -33,9 +33,12 @@ export default function () {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
+        body: JSON.stringify(projectDeleteRequestDTO),
       }
     );
     if (response.ok) {
+      const projectDeleteResponseDTO: ProjectDeleteResponseDTO = await response.json();
+      console.log("USUNIETO: ", projectDeleteResponseDTO);
       addToast({
         title: "SUCCESS!",
         description: "The project was successful deleted",
@@ -61,7 +64,7 @@ export default function () {
   useEffect(() => {
     async function fetchProjects() {
       const response = await fetch(
-        `http://localhost:8080/api/v1/projects?email=${localStorage.getItem("email")}`,
+        `http://localhost:8080/api/v1/projects/userProjects/${localStorage.getItem("id")}`,
         {
           method: "GET",
           headers: {
@@ -72,7 +75,7 @@ export default function () {
 
       if (response.ok) {
         console.log(response);
-        const jsonResponse: ProjectResponse = await response.json();
+        const jsonResponse: ProjectsResponseDTO = await response.json();
         console.log(jsonResponse);
         setProjects(jsonResponse.projects);
       }

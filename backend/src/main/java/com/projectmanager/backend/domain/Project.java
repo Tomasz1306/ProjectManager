@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Collate;
@@ -15,13 +16,14 @@ import org.hibernate.annotations.Collate;
 @NoArgsConstructor
 @AllArgsConstructor
 //******************//
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 @Entity
 @Table(name = "project")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_SEQUENCE")
-    @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence")
+    @SequenceGenerator(name = "PROJECT_SEQUENCE", sequenceName = "project_sequence", allocationSize = 1, initialValue = 1)
     private Long id;
 
     @Column(name = "name", unique = true)

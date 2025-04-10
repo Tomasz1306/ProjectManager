@@ -1,5 +1,6 @@
 package com.projectmanager.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +13,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 // **************** //
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 @Entity
 @Table(name = "project_user_issue")
 public class ProjectUserIssue {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_USER_ISSUE_SEQUENCE")
-    @SequenceGenerator(name = "PROJECT_USER_ISSUE_SEQUENCE", sequenceName = "project_user_issue_sequence")
+    @SequenceGenerator(name = "PROJECT_USER_ISSUE_SEQUENCE", sequenceName = "project_user_issue_sequence", allocationSize = 1, initialValue = 1)
     private Long id;
     
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

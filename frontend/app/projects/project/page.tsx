@@ -14,59 +14,24 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import { Drawer, DrawerContent } from "@heroui/drawer";
 import { HighPriorityIcon, IconWrapper } from "@/components/myicons";
 import { MyTableConponent } from "@/components/table/MyTableIssueComponent";
-
-interface Person {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  emailVerified: Date;
-  image: string;
-  createDate: Date;
-}
-
-interface Issue {
-  id: number;
-  name: string;
-  description: string;
-  createDate: string;
-  dueDate: string;
-  status: string;
-  priority: string;
-  type: string;
-}
-
-interface Project {
-  name: string;
-  description: string;
-  createDate: Date;
-  status: string;
-  creatorid: number;
-}
-
-interface CompleteProject {
-  person: Person;
-  project: Project;
-}
-
-interface IssueResponse {
-  issues: Issue[];
-}
-
-interface Valid {
-  valid: boolean;
-}
-
-interface ProjectLog {
-  id: number;
-  description: string;
-  projectlogdate: Date;
-  projectid: number;
-}
-
-interface ProjectLogResponse {
-  projectLogs: ProjectLog[];
-}
+import {
+  Project,
+  IssuePriority,
+  IssueStatus,
+  Issue,
+  Role,
+  User,
+  ProjectUser,
+  ProjectUserIssue,
+  CreateProjectResponseDTO,
+  ProjectDeleteResponseDTO,
+  ProjectIdResponseDTO,
+  ProjectsResponseDTO,
+  ProjectCreateRequestDTO,
+  ProjectDeleteRequestDTO,
+  CheckTokenResponse,
+  ProjectUserResponseDTO
+} from "@/types/types"
 
 export default function ProjectPage(projectId: number) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -75,14 +40,12 @@ export default function ProjectPage(projectId: number) {
   const [isValidToken, setIsValidToken] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
-  const [creator, setCreator] = useState<Person>();
+  const [creator, setCreator] = useState<User>();
   const [selectedIssue, setSeletedIssue] = useState<Issue>();
-  const [projectLogs, setProjectLogs] = useState<ProjectLog[]>([]);
-
 
   useEffect(() => {
     async function checkToken() {
-      const response = await fetch(
+      await fetch(
         "http://localhost:8080/api/v1/auth/checkToken",
         {
           method: "POST",
@@ -96,14 +59,18 @@ export default function ProjectPage(projectId: number) {
         }
       )
         .then(async (response) => {
+          console.log(response);
           if (response.ok) {
-            const jsonBody: Valid = await response.json();
-            if (jsonBody.valid) {
+            const checkTokenResponse = await response.json();
+            console.log("TO JEST OK: ? ", checkTokenResponse);
+            if (checkTokenResponse.valid) {
               setIsValidToken(true);
             } else {
+              console.log("PIERWSZY");
               router.push("/auth/login");
             }
           } else {
+            console.log("DRUGI");
             router.push("/auth/login");
           }
         })
@@ -117,27 +84,9 @@ export default function ProjectPage(projectId: number) {
   }, []);
 
   useEffect(() => {
-    async function fetchProjectLogs () {
-      const response = await fetch(`http://localhost:8080/api/v1/projectLogs/${params.get("projectId")}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-      if (response.ok) {
-        const jsonResponse: ProjectLogResponse = await response.json();
-        console.log(jsonResponse);
-        setProjectLogs(jsonResponse.projectLogs);
-        console.log(projectLogs);
-      }
-    }
-    fetchProjectLogs();
-  }, [projectLogs])
-
-  useEffect(() => {
     async function fetchProject() {
       const response = await fetch(
-        `http://localhost:8080/api/v1/completeProject/${params.get("projectId")}`,
+        `http://localhost:8080/api/v1/projects/${localStorage.getItem("id")}/${params.get("projectId")}`,
         {
           method: "GET",
           headers: {
@@ -146,35 +95,36 @@ export default function ProjectPage(projectId: number) {
         }
       );
       if (response.ok) {
-        const jsonResponse: CompleteProject = await response.json();
-        console.log(jsonResponse);
-        setCurrentProject(jsonResponse.project);
-        setCreator(jsonResponse.person);
+        const projectUserResponseDTO: ProjectUserResponseDTO = await response.json();
+        console.log(projectUserResponseDTO);
+        setCurrentProject(projectUserResponseDTO.projectUser.project);
+      } else {
+        router.push("/projects");
       }
     }
 
     fetchProject();
   }, []);
 
-  useEffect(() => {
-    async function fetchProjectIssues() {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/projectIssues/${params.get("projectId")}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer" + localStorage.getItem("token"),
-          },
-        }
-      );
-      if (response.ok) {
-        const jsonResponse: IssueResponse = await response.json();
-        setIssues(jsonResponse.issues);
-        console.log(jsonResponse);
-      }
-    }
-    fetchProjectIssues();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchProjectIssues() {
+  //     const response = await fetch(
+  //       `http://localhost:8080/api/v1/projectIssues/${params.get("projectId")}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: "Bearer" + localStorage.getItem("token"),
+  //         },
+  //       }
+  //     );
+  //     if (response.ok) {
+  //       const jsonResponse: IssueResponse = await response.json();
+  //       setIssues(jsonResponse.issues);
+  //       console.log(jsonResponse);
+  //     }
+  //   }
+  //   fetchProjectIssues();
+  // }, []);
 
   
   return (
@@ -223,12 +173,7 @@ export default function ProjectPage(projectId: number) {
                       </div>
                     </div>
                     <div className="basis-1/3">
-                    <p>{projectLogs?.length}</p>
-                    {projectLogs?.map((projectLog) => (
-                        <div key={projectLog.id}>
-                          <p key={projectLog.id}>{projectLog.description}</p>
-                        </div>
-                      ))}
+
                       
                     </div>
                   </div>
@@ -247,13 +192,13 @@ export default function ProjectPage(projectId: number) {
                 </CardBody>
               </Card>
             </Tab>
-            <Tab title="Issues" className="rounded-sm ">
-              <Card className="bg-transparent rounded-sm">
-                <CardBody className="bg-transparent">
-                  <MyTableConponent issuesProps={issues}></MyTableConponent>
-                </CardBody>
-              </Card>
-            </Tab>
+            {/*<Tab title="Issues" className="rounded-sm ">*/}
+            {/*  <Card className="bg-transparent rounded-sm">*/}
+            {/*    <CardBody className="bg-transparent">*/}
+            {/*      <MyTableConponent issuesProps={issues}></MyTableConponent>*/}
+            {/*    </CardBody>*/}
+            {/*  </Card>*/}
+            {/*</Tab>*/}
             <Tab title="Statistics">
               <Card>
                 <CardBody></CardBody>
