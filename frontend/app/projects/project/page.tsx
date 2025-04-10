@@ -417,7 +417,6 @@ export default function ProjectPage(projectId: number) {
           >
             <Tab title="Overview">
               <p className="text-small text-default-500 mx-3">Project name</p>
-              <p className="text-3xl1 mx-3">{currentProject?.name}</p>
               <Card
                 key="Overview"
                 title="Overview"
@@ -433,6 +432,7 @@ export default function ProjectPage(projectId: number) {
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <EmailOutlinedIcon />
                         <p>{creator?.email}</p>
+                      
                       </div>
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <LocalPhoneOutlinedIcon />
@@ -449,8 +449,8 @@ export default function ProjectPage(projectId: number) {
                       </div>
                     </div>
                     <div className="basis-1/3">
-                      <p>{projectLogs?.length}</p>
-                      {projectLogs?.map((projectLog) => (
+                    <p>{projectLogs?.length}</p>
+                    {projectLogs?.map((projectLog) => (
                         <div key={projectLog.id}>
                           <p key={projectLog.id}>{projectLog.description}</p>
                         </div>

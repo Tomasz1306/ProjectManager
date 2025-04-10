@@ -6,9 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.projectmanager.backend.config.JwtService;
-import com.projectmanager.backend.entity.Person;
-import com.projectmanager.backend.entity.Role;
-import com.projectmanager.backend.repository.PersonRepository;
+import com.projectmanager.backend.domain.User;
+import com.projectmanager.backend.domain.User.Role;
+import com.projectmanager.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,17 +18,17 @@ public class AuthenticationService {
 
     // private final AuthenticationController authenticationController;
 
-    private final PersonRepository repository;
+    private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var person = Person.builder()
+        var person = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .websiteRole(Role.USER)
                 .build();
 
         repository.save(person);
