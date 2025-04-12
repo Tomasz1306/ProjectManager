@@ -39,6 +39,9 @@ public class ProjectUser {
     @Column(name = "isOwner")
     private Boolean isOwner;
 
+    @Enumerated(EnumType.STRING)
+    private Role projectRole;
+
     @OneToMany(mappedBy = "projectUser")
     private List<ProjectUserIssue> projectUserIssues = new ArrayList<>();
 }

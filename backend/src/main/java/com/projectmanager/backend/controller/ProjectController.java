@@ -1,6 +1,7 @@
 package com.projectmanager.backend.controller;
 
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
+import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.service.ProjectUserService;
 import jakarta.validation.Valid;
@@ -51,6 +52,7 @@ public class ProjectController {
         System.out.println("RESPONSE: " + response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path = "/userProjects/{id}")
     public ResponseEntity<ProjectsResponseDTO> getUserProjects(@PathVariable("id") Long userId) {
@@ -58,6 +60,14 @@ public class ProjectController {
         System.out.println("RESPONSE: " + response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping(path = "/projectUsers/{id}")
+    public ResponseEntity<ProjectUsersResponseDTO> getProjectUsers(@RequestBody ProjectUsersRequestDTO request) {
+        ProjectUsersResponseDTO response = projectService.getProjectUsers(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/delete")
     public ResponseEntity<ProjectDeleteResponseDTO> deleteProject(@Valid @RequestBody ProjectDeleteRequestDTO request) {
