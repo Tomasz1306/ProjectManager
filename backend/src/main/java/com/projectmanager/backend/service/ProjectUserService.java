@@ -9,7 +9,7 @@ import com.projectmanager.backend.domain.ProjectUser;
 import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
-import com.projectmanager.backend.dto.request.UserResponseDTO;
+import com.projectmanager.backend.dto.response.UserResponseDTO;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.repository.ProjectUserRepository;
 import com.projectmanager.backend.repository.UserRepository;
@@ -83,6 +83,7 @@ public class ProjectUserService {
         User user = userRepository.findById(userId).get();
         Optional<ProjectUser> projectUser = projectUserRepository.findByProjectAndUser(project, user);
 
+        //TODO CHANGE TO ProjectUserDTO
         if (projectUser.isPresent()) {
             return ProjectUserResponseDTO
                     .builder()
@@ -146,21 +147,28 @@ public class ProjectUserService {
         if (projectUser.isEmpty()) {
             return ProjectUsersResponseDTO.builder().information("User is not assigned to this project").build();
         }
-        List<UserResponseDTO> users = new ArrayList<>();
+        List<ProjectUserDTO> projectUsersDTO = new ArrayList<>();
         List<ProjectUser> projectUsers = projectUserRepository.findByProject(project.get());
         for (var projectUser_: projectUsers) {
-            UserResponseDTO user_ = UserResponseDTO
+            UserDTO user_ = UserDTO
                     .builder().id(projectUser_.getUser().getId())
                     .name(projectUser_.getUser().getName())
                     .username(projectUser_.getUser().getUsername())
                     .email(projectUser_.getUser().getEmail())
                     .build();
-            users.add(user_);
+            projectUsersDTO.add(ProjectUserDTO
+                    .builder()
+                    .user(user_)
+                    .isOwner(projectUser_.getIsOwner())
+                    .id(projectUser_.getId())
+                    .project(projectUser_.getProject())
+                    .role(projectUser_.getProjectRole().name())
+                    .build());
         }
         return ProjectUsersResponseDTO
-        .builder()
+                .builder()
                 .information("Successfully")
-                .users(users)
+                .projectUsers(projectUsersDTO)
                 .build();
     }
 }

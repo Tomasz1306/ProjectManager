@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 //Lombok annotations//
 @Data
 @Builder
@@ -14,7 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 // **************** //
 
-public class ProjectUsersResponseDTO {
-    private List<ProjectUserDTO> projectUsers;
-    private String information;
+public class UserDTO {
+    private Long id;
+    private String email;
+    private String name;
+    private String username;
 }

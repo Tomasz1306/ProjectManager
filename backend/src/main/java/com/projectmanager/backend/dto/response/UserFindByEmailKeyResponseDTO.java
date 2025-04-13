@@ -1,7 +1,7 @@
 package com.projectmanager.backend.dto.response;
 
 import com.projectmanager.backend.domain.User;
-import com.projectmanager.backend.dto.request.UserResponseDTO;
+import com.projectmanager.backend.dto.response.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
