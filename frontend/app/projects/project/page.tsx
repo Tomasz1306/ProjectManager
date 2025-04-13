@@ -16,22 +16,12 @@ import { HighPriorityIcon, IconWrapper } from "@/components/myicons";
 import { MyTableConponent } from "@/components/table/MyTableIssueComponent";
 import {
   Project,
-  IssuePriority,
-  IssueStatus,
   Issue,
-  Role,
   User,
-  ProjectUser,
-  ProjectUserIssue,
-  CreateProjectResponseDTO,
-  ProjectDeleteResponseDTO,
-  ProjectIdResponseDTO,
-  ProjectsResponseDTO,
-  ProjectCreateRequestDTO,
-  ProjectDeleteRequestDTO,
-  CheckTokenResponse,
-  ProjectUserResponseDTO
+  ProjectUserResponseDTO,
+  ProjectUsersResponseDTO, ProjectUser,
 } from "@/types/types"
+import MemberTableComponent from "@/components/table/MemberTableComponent";
 
 export default function ProjectPage(projectId: number) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -42,6 +32,7 @@ export default function ProjectPage(projectId: number) {
   const [currentProject, setCurrentProject] = useState<Project>();
   const [creator, setCreator] = useState<User>();
   const [selectedIssue, setSeletedIssue] = useState<Issue>();
+  const [projectMembers, setProjectMembers] = useState<ProjectUser[]>([]);
 
   useEffect(() => {
     async function checkToken() {
@@ -105,6 +96,29 @@ export default function ProjectPage(projectId: number) {
 
     fetchProject();
   }, []);
+
+  useEffect(() => {
+    async function fetchProjectMembers() {
+      const response = await fetch(`http://localhost:8080/api/v1/projects/projectUsers/${params.get("projectId")}`, {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: localStorage.getItem("id"),
+              projectId: params.get("projectId")
+            })
+          }
+      );
+      if (response.ok) {
+        const membersProjectUsersResponseDTO: ProjectUsersResponseDTO = await response.json();
+        console.log(membersProjectUsersResponseDTO);
+        setProjectMembers(membersProjectUsersResponseDTO.projectUsers);
+      }
+    }
+      fetchProjectMembers();
+  }, [])
 
   // useEffect(() => {
   //   async function fetchProjectIssues() {
@@ -189,6 +203,15 @@ export default function ProjectPage(projectId: number) {
                     </p>
                     <p className="text-lg">Meetings soon</p>
                   </div>
+                </CardBody>
+              </Card>
+            </Tab>
+            <Tab title="Members" className="rounded-sm ">
+              <Card className="bg-transparent rounded-sm">
+                <CardBody className="bg-transparent">
+                  <MemberTableComponent projectUsers={projectMembers}>
+
+                  </MemberTableComponent>
                 </CardBody>
               </Card>
             </Tab>

@@ -46,6 +46,7 @@ export interface ProjectUser {
   id: number;
   project: Project;
   user: User;
+  role: String;
   isOwner: boolean;
 }
 
@@ -100,4 +101,9 @@ export interface UserFindByEmailKeyRequestDTO {
 
 export interface UserFindByEmailKeyResponseDTO {
   users: User[];
+}
+
+export interface ProjectUsersResponseDTO {
+  projectUsers: ProjectUser[];
+  information: string;
 }
