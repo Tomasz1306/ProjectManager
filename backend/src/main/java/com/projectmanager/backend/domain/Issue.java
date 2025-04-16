@@ -3,12 +3,10 @@ package com.projectmanager.backend.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 //Lombok annotations//
 @Data
@@ -34,12 +32,15 @@ public class Issue {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "status_id")
+    @JsonBackReference
     private IssueStatus status;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "priority_id")
+    @JsonBackReference
     private IssuePriority priority;
 
     @OneToMany(mappedBy = "issue", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ToString.Exclude
     private List<ProjectUserIssue> projectUserIssues = new ArrayList<>();
 }

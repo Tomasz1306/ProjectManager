@@ -1,5 +1,6 @@
 package com.projectmanager.backend.controller;
 
+import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
 import com.projectmanager.backend.dto.response.*;
@@ -49,7 +50,6 @@ public class ProjectController {
     @GetMapping()
     public ResponseEntity<ProjectsResponseDTO> getProjects() {
         ProjectsResponseDTO response = projectService.getProjects();
-        System.out.println("RESPONSE: " + response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -57,12 +57,11 @@ public class ProjectController {
     @GetMapping(path = "/userProjects/{id}")
     public ResponseEntity<ProjectsResponseDTO> getUserProjects(@PathVariable("id") Long userId) {
         ProjectsResponseDTO response = projectService.getUserProjects(userId);
-        System.out.println("RESPONSE: " + response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @PostMapping(path = "/projectUsers/{id}")
+    @PostMapping(path = "/projectUsers")
     public ResponseEntity<ProjectUsersResponseDTO> getProjectUsers(@RequestBody ProjectUsersRequestDTO request) {
         ProjectUsersResponseDTO response = projectService.getProjectUsers(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -72,6 +71,13 @@ public class ProjectController {
     @PostMapping("/delete")
     public ResponseEntity<ProjectDeleteResponseDTO> deleteProject(@Valid @RequestBody ProjectDeleteRequestDTO request) {
         ProjectDeleteResponseDTO response = projectService.deleteProject(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/addUser")
+    public ResponseEntity<AddUserToProjectResponseDTO> addUserToProject(@Valid @RequestBody AddUserToProjectRequestDTO request) {
+        AddUserToProjectResponseDTO response = projectService.addUserToProject(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     

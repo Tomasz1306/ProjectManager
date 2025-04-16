@@ -43,5 +43,6 @@ public class ProjectUser {
     private Role projectRole;
 
     @OneToMany(mappedBy = "projectUser")
+    @JsonBackReference
     private List<ProjectUserIssue> projectUserIssues = new ArrayList<>();
 }

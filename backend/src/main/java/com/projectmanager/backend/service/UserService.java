@@ -32,7 +32,6 @@ public class UserService {
                     .name(user.getName())
                     .build());
         }
-        System.out.println(findedUsersDTO);
         return UserFindByEmailKeyResponseDTO
                 .builder()
                 .users(findedUsersDTO)

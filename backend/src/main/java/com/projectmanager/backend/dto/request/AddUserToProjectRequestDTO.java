@@ -1,6 +1,7 @@
-package com.projectmanager.backend.dto.response;
+package com.projectmanager.backend.dto.request;
 
-import com.projectmanager.backend.domain.Project;
+import com.projectmanager.backend.domain.Role;
+import com.projectmanager.backend.dto.response.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 // **************** //
 
-public class ProjectUserDTO {
-    private Long id;
+public class AddUserToProjectRequestDTO {
     private UserDTO user;
-    private Project project;
-    private String role;
+    private Long projectId;
     private boolean owner;
+    private Role projectRole;
 }

@@ -1,19 +1,14 @@
 "use client";
 import { useDisclosure } from "@heroui/react";
-import { Card, CardBody } from "@heroui/card";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
-import { Listbox, ListboxItem } from "@heroui/listbox";
 import { useEffect, useState } from "react";
 import React from "react";
-import { Chip } from "@heroui/chip";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, Tab } from "@heroui/tabs";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import { Drawer, DrawerContent } from "@heroui/drawer";
-import { HighPriorityIcon, IconWrapper } from "@/components/myicons";
-import { MyTableConponent } from "@/components/table/MyTableIssueComponent";
 import {
   Project,
   Issue,
@@ -22,16 +17,14 @@ import {
   ProjectUsersResponseDTO, ProjectUser,
 } from "@/types/types"
 import MemberTableComponent from "@/components/table/MemberTableComponent";
+import AddMember from "@/components/AddMember";
 
 export default function ProjectPage(projectId: number) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const params = useSearchParams();
   const router = useRouter();
   const [isValidToken, setIsValidToken] = useState(false);
-  const [issues, setIssues] = useState<Issue[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>();
-  const [creator, setCreator] = useState<User>();
-  const [selectedIssue, setSeletedIssue] = useState<Issue>();
+  const [owner, setOwner] = useState<User>();
   const [projectMembers, setProjectMembers] = useState<ProjectUser[]>([]);
 
   useEffect(() => {
@@ -87,7 +80,6 @@ export default function ProjectPage(projectId: number) {
       );
       if (response.ok) {
         const projectUserResponseDTO: ProjectUserResponseDTO = await response.json();
-        console.log(projectUserResponseDTO);
         setCurrentProject(projectUserResponseDTO.projectUser.project);
       } else {
         router.push("/projects");
@@ -99,7 +91,7 @@ export default function ProjectPage(projectId: number) {
 
   useEffect(() => {
     async function fetchProjectMembers() {
-      const response = await fetch(`http://localhost:8080/api/v1/projects/projectUsers/${params.get("projectId")}`, {
+      const response = await fetch(`http://localhost:8080/api/v1/projects/projectUsers`, {
             method: "POST",
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token"),
@@ -113,35 +105,21 @@ export default function ProjectPage(projectId: number) {
       );
       if (response.ok) {
         const membersProjectUsersResponseDTO: ProjectUsersResponseDTO = await response.json();
-        console.log(membersProjectUsersResponseDTO);
+        console.log("GDZIE USER: " , membersProjectUsersResponseDTO);
         setProjectMembers(membersProjectUsersResponseDTO.projectUsers);
+        setOwner(membersProjectUsersResponseDTO.projectUsers.find((member) => member.owner)?.user);
+        console.log("HALO: " ,membersProjectUsersResponseDTO.projectUsers.find((member) => member.owner === true));
       }
     }
       fetchProjectMembers();
   }, [])
 
-  // useEffect(() => {
-  //   async function fetchProjectIssues() {
-  //     const response = await fetch(
-  //       `http://localhost:8080/api/v1/projectIssues/${params.get("projectId")}`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: "Bearer" + localStorage.getItem("token"),
-  //         },
-  //       }
-  //     );
-  //     if (response.ok) {
-  //       const jsonResponse: IssueResponse = await response.json();
-  //       setIssues(jsonResponse.issues);
-  //       console.log(jsonResponse);
-  //     }
-  //   }
-  //   fetchProjectIssues();
-  // }, []);
-
+  useEffect(() => {
+    console.log(projectMembers);
+  }, [projectMembers])
   
   return (
+    
     <div>
       <div className="w-full border-1 dark:bg-gray-950">
         <div className="w-full flex flex-col justify-center">
@@ -169,7 +147,7 @@ export default function ProjectPage(projectId: number) {
                       </p>
                       <div className="flex flex-row justify-start gap-3 my-2">
                         <EmailOutlinedIcon />
-                        <p>{creator?.email}</p>
+                        <p>{owner?.email}</p>
                       
                       </div>
                       <div className="flex flex-row justify-start gap-3 my-2">
@@ -208,6 +186,13 @@ export default function ProjectPage(projectId: number) {
             </Tab>
             <Tab title="Members" className="rounded-sm ">
               <Card className="bg-transparent rounded-sm">
+                <CardHeader>
+                  <AddMember projectId={Number(params.get("projectId"))}
+                   projectOwner={owner}
+                   projectMembers={projectMembers}
+                   setProjectMembers={setProjectMembers}
+                   ></AddMember>
+                </CardHeader>
                 <CardBody className="bg-transparent">
                   <MemberTableComponent projectUsers={projectMembers}>
 

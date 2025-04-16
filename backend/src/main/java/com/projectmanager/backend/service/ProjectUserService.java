@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import com.projectmanager.backend.domain.ProjectUser;
+import com.projectmanager.backend.domain.Role;
 import com.projectmanager.backend.domain.User;
+import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
 import com.projectmanager.backend.dto.response.UserResponseDTO;
@@ -51,6 +53,7 @@ public class ProjectUserService {
                 .builder()
                 .project(createdProject)
                 .user(user.get())
+                .projectRole(Role.PROJECT_MANAGER)
                 .isOwner(true)
                 .build();
         projectUserRepository.save(newProjectUser);
@@ -103,10 +106,10 @@ public class ProjectUserService {
                 projects.add(project.get());
             }
         }
-        System.out.println("User Projects found: " + projects);
         return ProjectsResponseDTO.builder().projects(projects).build();
     }
 
+    //TODO ADD TO TESTS (deleteProject)
     public ProjectDeleteResponseDTO deleteProject(ProjectDeleteRequestDTO request) {
         Optional<Project> projectToDelete = projectRepository.findById(request.getProjectId());
         Optional<User> user = userRepository.findById(request.getUserId());
@@ -118,7 +121,6 @@ public class ProjectUserService {
         }
         Optional<ProjectUser> projectUser = projectUserRepository.findByProjectAndUser(projectToDelete.get(),
                 user.get());
-        System.out.println(projectUser.get());
         if (projectUser.isEmpty()) {
             return ProjectDeleteResponseDTO.builder().information("User is assigned to project").status(false).build();
         }
@@ -127,13 +129,14 @@ public class ProjectUserService {
                     .build();
         }
         Long id = projectToDelete.get().getId();
-List<ProjectUser> projectUsers = projectUserRepository.findByProject(projectToDelete.get());
+        List<ProjectUser> projectUsers = projectUserRepository.findByProject(projectToDelete.get());
         System.out.println(projectUsers);
         projectUserRepository.deleteAll(projectUsers);
         projectRepository.delete(projectToDelete.get());
         return ProjectDeleteResponseDTO.builder().information("Successfully").status(true).projectId(id).build();
     }
 
+    //TODO ADD TO TESTS (getProjectusers)
     public ProjectUsersResponseDTO getProjectUsers(ProjectUsersRequestDTO request) {
         Optional<Project> project = projectRepository.findById(request.getProjectId());
         Optional<User> user = userRepository.findById(request.getUserId());
@@ -161,7 +164,7 @@ List<ProjectUser> projectUsers = projectUserRepository.findByProject(projectToDe
             projectUsersDTO.add(ProjectUserDTO
                     .builder()
                     .user(user_)
-                    .isOwner(projectUser_.getIsOwner())
+                    .owner(projectUser_.getIsOwner())
                     .id(projectUser_.getId())
                     .project(projectUser_.getProject())
                     .role(projectUser_.getProjectRole().name())
@@ -171,6 +174,54 @@ List<ProjectUser> projectUsers = projectUserRepository.findByProject(projectToDe
                 .builder()
                 .information("Successfully")
                 .projectUsers(projectUsersDTO)
+                .build();
+    }
+    //TODO ADD TO TESTS (addUserToProject)
+    public AddUserToProjectResponseDTO addUserToProject(AddUserToProjectRequestDTO request) {
+        if (!request.isOwner()) {
+            return AddUserToProjectResponseDTO
+                    .builder()
+                    .information("User is not a owner of project")
+                    .status(false)
+                    .build();
+        }
+        Optional<User> user = userRepository.findById(request.getUser().getId());
+        Optional<Project> project = projectRepository.findById(request.getProjectId());
+        if (project.isEmpty()) {
+            return AddUserToProjectResponseDTO
+                    .builder()
+                    .information("Project not exists")
+                    .status(false)
+                    .build();
+        }
+        ProjectUser newProjectUser = ProjectUser
+                .builder()
+                .project(project.get())
+                .user(user.get())
+                .isOwner(false)
+                .projectRole(request.getProjectRole())
+                .build();
+        ProjectUser addedProjectUser = projectUserRepository.save(newProjectUser);
+        UserDTO userDTO = UserDTO
+                .builder()
+                .id(user.get().getId())
+                .name(user.get().getName())
+                .username(user.get().getUsername())
+                .email(user.get().getEmail())
+                .build();
+        ProjectUserDTO addedProjectUserDTO = ProjectUserDTO
+                .builder()
+                .project(addedProjectUser.getProject())
+                .user(userDTO)
+                .owner(false)
+                .role(addedProjectUser.getProjectRole().name())
+                .id(addedProjectUser.getId())
+                .build();
+        return AddUserToProjectResponseDTO
+                .builder()
+                .information("Sucessfully")
+                .status(true)
+                .projectUser(addedProjectUserDTO)
                 .build();
     }
 }

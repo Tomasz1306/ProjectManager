@@ -21,7 +21,9 @@ function MemberTableComponent ({projectUsers}: {projectUsers: ProjectUser[]}) {
 
     return (
         <>
-            <Table>
+            <Table
+            
+            >
                 <TableHeader columns={columns}>
                     {(column) => (
                         <TableColumn
