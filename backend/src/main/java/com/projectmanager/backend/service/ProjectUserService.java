@@ -127,8 +127,10 @@ public class ProjectUserService {
                     .build();
         }
         Long id = projectToDelete.get().getId();
-        projectUserRepository.delete(projectUser.get());
-        projectRepository.delete(projectUser.get().getProject());
+List<ProjectUser> projectUsers = projectUserRepository.findByProject(projectToDelete.get());
+        System.out.println(projectUsers);
+        projectUserRepository.deleteAll(projectUsers);
+        projectRepository.delete(projectToDelete.get());
         return ProjectDeleteResponseDTO.builder().information("Successfully").status(true).projectId(id).build();
     }
 
