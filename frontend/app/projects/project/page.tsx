@@ -194,7 +194,7 @@ export default function ProjectPage(projectId: number) {
                    ></AddMember>
                 </CardHeader>
                 <CardBody className="bg-transparent">
-                  <MemberTableComponent projectUsers={projectMembers}>
+                  <MemberTableComponent projectMembers={projectMembers} setProjectMembers={setProjectMembers}>
 
                   </MemberTableComponent>
                 </CardBody>

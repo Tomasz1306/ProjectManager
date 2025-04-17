@@ -1,8 +1,6 @@
 package com.projectmanager.backend.controller;
 
-import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
+import com.projectmanager.backend.dto.request.*;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.service.ProjectUserService;
 import jakarta.validation.Valid;
@@ -11,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import com.projectmanager.backend.dto.request.ProjectCreateRequestDTO;
 
 @RestController("ProjectController")
 @Validated
@@ -78,6 +74,13 @@ public class ProjectController {
     @PostMapping("/addUser")
     public ResponseEntity<AddUserToProjectResponseDTO> addUserToProject(@Valid @RequestBody AddUserToProjectRequestDTO request) {
         AddUserToProjectResponseDTO response = projectService.addUserToProject(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/deleteUser")
+    public ResponseEntity<ProjectDeleteUserResponseDTO> deleteUserFromProject(@Valid @RequestBody ProjectDeleteUserRequestDTO request) {
+        ProjectDeleteUserResponseDTO response = projectService.deleteUserFromProject(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     

@@ -8,9 +8,7 @@ import java.util.logging.Logger;
 import com.projectmanager.backend.domain.ProjectUser;
 import com.projectmanager.backend.domain.Role;
 import com.projectmanager.backend.domain.User;
-import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
+import com.projectmanager.backend.dto.request.*;
 import com.projectmanager.backend.dto.response.UserResponseDTO;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.repository.ProjectUserRepository;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projectmanager.backend.domain.Project;
-import com.projectmanager.backend.dto.request.ProjectCreateRequestDTO;
 import com.projectmanager.backend.repository.ProjectRepository;
 
 @Service("ProjectUserService")
@@ -181,7 +178,7 @@ public class ProjectUserService {
         if (!request.isOwner()) {
             return AddUserToProjectResponseDTO
                     .builder()
-                    .information("User is not a owner of project")
+                    .information("You are not a owner of project")
                     .status(false)
                     .build();
         }
@@ -222,6 +219,68 @@ public class ProjectUserService {
                 .information("Sucessfully")
                 .status(true)
                 .projectUser(addedProjectUserDTO)
+                .build();
+    }
+
+    public ProjectDeleteUserResponseDTO deleteUserFromProject(ProjectDeleteUserRequestDTO request) {
+        Optional<User> initiator = userRepository.findById(request.getInitiator().getId());
+        Optional<Project> project = projectRepository.findById(request.getProjectId());
+        if (initiator.isEmpty()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("You are not in a database")
+                    .build();
+        }
+        if (project.isEmpty()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("Cannot find project")
+                    .status(false)
+                    .build();
+        }
+        Optional<ProjectUser> projectUserInitiator = projectUserRepository.findByProjectAndUser(project.get(), initiator.get());
+        if (projectUserInitiator.isEmpty()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("You are not assigned to this project")
+                    .status(false)
+                    .build();
+        }
+        if (!projectUserInitiator.get().getIsOwner()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("You are not a owner of project")
+                    .status(false)
+                    .build();
+        }
+        Optional<User> userToDelete = userRepository.findById(request.getUser().getId());
+        if (userToDelete.isEmpty()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("Cannot find user to delete")
+                    .status(false)
+                    .build();
+        }
+        Optional<ProjectUser> projectUserToDelete = projectUserRepository.findByProjectAndUser(project.get(), userToDelete.get());
+        if (projectUserToDelete.isEmpty()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("User is not assigned to this project")
+                    .status(false)
+                    .build();
+        }
+        if (projectUserToDelete.get().getIsOwner()) {
+            return ProjectDeleteUserResponseDTO
+                    .builder()
+                    .information("Cannot delete project owner")
+                    .status(false)
+                    .build();
+        }
+        projectUserRepository.delete(projectUserToDelete.get());
+        return ProjectDeleteUserResponseDTO
+                .builder()
+                .information("Successfully deleted")
+                .status(true)
                 .build();
     }
 }

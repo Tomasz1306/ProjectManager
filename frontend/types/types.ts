@@ -113,3 +113,8 @@ export interface AddUserToProjectResponseDTO {
   status: boolean;
   projectUser: ProjectUser;
 }
+
+export interface ProjectDeleteUserResponseDTO {
+  information: string;
+  status: boolean;
+}
