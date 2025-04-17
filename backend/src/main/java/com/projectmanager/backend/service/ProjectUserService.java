@@ -106,7 +106,6 @@ public class ProjectUserService {
         return ProjectsResponseDTO.builder().projects(projects).build();
     }
 
-    //TODO ADD TO TESTS (deleteProject)
     public ProjectDeleteResponseDTO deleteProject(ProjectDeleteRequestDTO request) {
         Optional<Project> projectToDelete = projectRepository.findById(request.getProjectId());
         Optional<User> user = userRepository.findById(request.getUserId());
