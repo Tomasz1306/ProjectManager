@@ -118,3 +118,9 @@ export interface ProjectDeleteUserResponseDTO {
   information: string;
   status: boolean;
 }
+
+export interface ProjectUpdateUserRespnseDTO {
+  information: string;
+  status: boolean;
+  projectUser: ProjectUser;
+}

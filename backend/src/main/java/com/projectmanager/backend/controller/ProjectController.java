@@ -83,5 +83,12 @@ public class ProjectController {
         ProjectDeleteUserResponseDTO response = projectService.deleteUserFromProject(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/updateUser")
+    public ResponseEntity<ProjectUpdateUserResponseDTO> updateProjectUser(@Valid @RequestBody ProjectUpdateUserRequestDTO request) {
+        System.out.println(request);
+        ProjectUpdateUserResponseDTO response = projectService.updateProjectUser(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

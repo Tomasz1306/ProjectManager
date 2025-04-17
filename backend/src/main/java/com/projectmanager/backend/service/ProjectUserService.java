@@ -283,4 +283,76 @@ public class ProjectUserService {
                 .status(true)
                 .build();
     }
+
+    public ProjectUpdateUserResponseDTO updateProjectUser(ProjectUpdateUserRequestDTO request) {
+        Optional<User> initiator = userRepository.findById(request.getInitiator().getId());
+        Optional<Project> project = projectRepository.findById(request.getProjectId());
+        if (initiator.isEmpty()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("You are not in a database")
+                    .build();
+        }
+        if (project.isEmpty()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("Cannot find project")
+                    .status(false)
+                    .build();
+        }
+        Optional<ProjectUser> projectUserInitiator = projectUserRepository.findByProjectAndUser(project.get(), initiator.get());
+        if (projectUserInitiator.isEmpty()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("You are not assigned to this project")
+                    .status(false)
+                    .build();
+        }
+        if (!projectUserInitiator.get().getIsOwner()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("You are not a owner of project")
+                    .status(false)
+                    .build();
+        }
+        Optional<User> userToUpdate = userRepository.findById(request.getProjectUserToUpdate().getUser().getId());
+        if (userToUpdate.isEmpty()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("User to update not exists")
+                    .status(false)
+                    .build();
+        }
+        Optional<ProjectUser> projectUserToUpdate = projectUserRepository.findByProjectAndUser(project.get(), userToUpdate.get());
+        if (projectUserToUpdate.isEmpty()) {
+            return ProjectUpdateUserResponseDTO
+                    .builder()
+                    .information("User is not assigned to this project")
+                    .status(false)
+                    .build();
+        }
+        projectUserToUpdate.get().setProjectRole(request.getNewRole());
+        projectUserRepository.save(projectUserToUpdate.get());
+
+        User updatedUser = userRepository.findById(projectUserToUpdate.get().getUser().getId()).get();
+        UserDTO updatedUserDTO = UserDTO
+                .builder()
+                .id(updatedUser.getId())
+                .name(updatedUser.getName())
+                .email(updatedUser.getEmail())
+                .build();
+        ProjectUserDTO updatedProjectUserDTO = ProjectUserDTO
+                .builder()
+                .user(updatedUserDTO)
+                .project(projectUserToUpdate.get().getProject())
+                .owner(projectUserToUpdate.get().getIsOwner())
+                .role(projectUserToUpdate.get().getProjectRole().name())
+                .build();
+        return ProjectUpdateUserResponseDTO
+                .builder()
+                .information("Successfully updated")
+                .status(true)
+                .projectUser(updatedProjectUserDTO)
+                .build();
+    }
 }
