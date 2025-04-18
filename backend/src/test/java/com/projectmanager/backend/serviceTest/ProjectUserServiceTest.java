@@ -4,6 +4,7 @@ package com.projectmanager.backend.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.projectmanager.backend.domain.Role;
+import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
 import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
 import com.projectmanager.backend.dto.response.*;
@@ -354,5 +355,63 @@ public class ProjectUserServiceTest {
         assertEquals(projectUsersDTO, response.getProjectUsers());
     }
 
+    @Test
+    public void addUserToProjectTest() {
+        Project project = Project
+                .builder()
+                .id(1L)
+                .name("project 1")
+                .description("description 1")
+                .build();
 
+        User userToAdd = User
+                .builder()
+                .id(2L)
+                .name("User 2")
+                .email("user2@example.com")
+                .password("password2")
+                .build();
+
+        UserDTO userToAddDTO = UserDTO
+                .builder()
+                .id(2L)
+                .name("User 2")
+                .email("user2@example.com")
+                .username(userToAdd.getUsername())
+                .build();
+
+        ProjectUser projectUserToAdd = ProjectUser
+                .builder()
+                .id(1L)
+                .user(userToAdd)
+                .project(project)
+                .isOwner(false)
+                .projectRole(Role.DEVELOPER)
+                .build();
+
+        ProjectUserDTO projectUserToAddDTO = ProjectUserDTO
+                .builder()
+                .project(project)
+                .user(userToAddDTO)
+                .id(1L)
+                .owner(false)
+                .role("DEVELOPER")
+                .build();
+
+        AddUserToProjectRequestDTO request = AddUserToProjectRequestDTO
+                .builder()
+                .projectId(project.getId())
+                .owner(true)
+                .user(userToAddDTO)
+                .build();
+
+        Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(userToAdd));
+        Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        Mockito.when(projectUserRepository.save(Mockito.any(ProjectUser.class))).thenReturn(projectUserToAdd);
+        AddUserToProjectResponseDTO response = projectService.addUserToProject(request);
+
+        assertEquals("Successfully", response.getInformation());
+        assertEquals(true, response.isStatus());
+        assertEquals(projectUserToAddDTO, response.getProjectUser());
+    }
 }

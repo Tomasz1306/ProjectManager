@@ -173,6 +173,7 @@ public class ProjectUserService {
                 .build();
     }
     //TODO ADD TO TESTS (addUserToProject)
+    //TODO change boolean owner in request to UserDTO
     public AddUserToProjectResponseDTO addUserToProject(AddUserToProjectRequestDTO request) {
         if (!request.isOwner()) {
             return AddUserToProjectResponseDTO
@@ -215,7 +216,7 @@ public class ProjectUserService {
                 .build();
         return AddUserToProjectResponseDTO
                 .builder()
-                .information("Sucessfully")
+                .information("Successfully")
                 .status(true)
                 .projectUser(addedProjectUserDTO)
                 .build();
