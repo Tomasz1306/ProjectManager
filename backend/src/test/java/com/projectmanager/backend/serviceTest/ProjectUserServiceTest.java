@@ -4,9 +4,7 @@ package com.projectmanager.backend.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.projectmanager.backend.domain.Role;
-import com.projectmanager.backend.dto.request.AddUserToProjectRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectDeleteRequestDTO;
-import com.projectmanager.backend.dto.request.ProjectUsersRequestDTO;
+import com.projectmanager.backend.dto.request.*;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.repository.ProjectRepository;
 import com.projectmanager.backend.repository.ProjectUserRepository;
@@ -18,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.projectmanager.backend.dto.request.ProjectCreateRequestDTO;
 import com.projectmanager.backend.repository.UserRepository;
 import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.domain.Project;
@@ -413,5 +410,98 @@ public class ProjectUserServiceTest {
         assertEquals("Successfully", response.getInformation());
         assertEquals(true, response.isStatus());
         assertEquals(projectUserToAddDTO, response.getProjectUser());
+    }
+
+    @Test
+    public void updateProjectUserTest() {
+        Project project = Project
+                .builder()
+                .id(1L)
+                .name("project 1")
+                .description("description 1")
+                .build();
+
+        User user = User
+                .builder()
+                .id(1L)
+                .name("User 1")
+                .email("user1@example.com")
+                .password("password1")
+                .build();
+
+        UserDTO userDTO = UserDTO
+                .builder()
+                .id(1L)
+                .name("User 1")
+                .email("user1@example.com")
+                .build();
+
+        User userToUpdate = User
+                .builder()
+                .id(2L)
+                .name("user 2")
+                .email("user2@example.com")
+                .password("password2")
+                .build();
+
+        UserDTO userToUpdateDTO = UserDTO
+                .builder()
+                .id(2L)
+                .name("user 2")
+                .email("user2@example.com")
+                .build();
+
+        ProjectUser projectUser = ProjectUser
+                .builder()
+                .project(project)
+                .user(user)
+                .isOwner(true)
+                .projectRole(Role.DEVELOPER)
+                .build();
+
+        ProjectUserDTO projectUserDTO = ProjectUserDTO
+                .builder()
+                .id(1L)
+                .project(project)
+                .user(userDTO)
+                .owner(true)
+                .role("DEVELOPER")
+                .build();
+
+        ProjectUser projectUserToUpdate = ProjectUser
+                .builder()
+                .id(2L)
+                .project(project)
+                .user(userToUpdate)
+                .isOwner(false)
+                .projectRole(Role.DEVELOPER)
+                .build();
+
+        ProjectUserDTO projectUserToUpdateDTO = ProjectUserDTO
+                .builder()
+                .project(project)
+                .user(userToUpdateDTO)
+                .owner(false)
+                .role("DEVELOPER")
+                .build();
+
+        ProjectUpdateUserRequestDTO request = ProjectUpdateUserRequestDTO
+                .builder()
+                .projectUserToUpdate(projectUserToUpdateDTO)
+                .projectId(1L)
+                .newRole(Role.QA_ENGINEER)
+                .initiator(projectUserDTO)
+                .build();
+
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(userToUpdate));
+        Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        Mockito.when(projectUserRepository.findByProjectAndUser(project, user)).thenReturn(Optional.of(projectUser));
+        Mockito.when(projectUserRepository.findByProjectAndUser(project,userToUpdate)).thenReturn(Optional.of(projectUserToUpdate));
+        ProjectUpdateUserResponseDTO response = projectService.updateProjectUser(request);
+
+        assertEquals("Successfully updated", response.getInformation());
+        assertEquals(true, response.isStatus());
+        assertEquals(Role.QA_ENGINEER.name(), response.getProjectUser().getRole());
     }
 }
