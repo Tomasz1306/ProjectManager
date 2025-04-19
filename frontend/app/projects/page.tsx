@@ -15,10 +15,45 @@ import {
   ProjectsResponseDTO,
   Project,
 } from "@/types/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@heroui/table";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  AutocompleteSection,
+} from "@heroui/autocomplete";
+import { Input } from "@heroui/input";
 
-// eslint-disable-next-line react/display-name
+const columns = [
+  { name: "Name", uid: "name", sortable: true },
+  { name: "Role", uid: "email", sortable: true },
+  { name: "Status", uid: "role", sortable: true },
+  { name: "Actions", uid: "actions", sortable: true },
+];
+
 export default function () {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [search, setSearch] = useState("");
+  const [foundedProjects, setFoundedProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    if (search === "") {
+      setFoundedProjects(projects)
+    }
+    setFoundedProjects(
+      projects.filter((project) => {
+        if (project.name.match(search) !== null) {
+          return project;
+        }
+      })
+    )
+  }, [search])
 
   async function handleDeleteProject(projectId: number) {
     const projectDeleteRequestDTO: ProjectDeleteRequestDTO = {
@@ -88,6 +123,7 @@ export default function () {
         const jsonResponse: ProjectsResponseDTO = await response.json();
         console.log(jsonResponse);
         setProjects(jsonResponse.projects);
+        setFoundedProjects(jsonResponse.projects);
       }
     }
 
@@ -96,65 +132,106 @@ export default function () {
 
   return (
     <div className="w-full flex flex-col justify-center">
-      <div className="flex justify-end ">
+      <div className="my-4">
+        <p className="text-5xl font-bold">Projects</p>
+      </div>
+      <div className="my-4">
+        <Input
+          isClearable
+          classNames={{
+            label: "text-white text-lg",
+            input: [" text-lg text-white"],
+            innerWrapper: "bg-transparent",
+            inputWrapper: [
+              "shadow-xl rounded-none bg-[#38214A] text-white",
+              "backdrop-blur-xl",
+              "backdrop-saturate-200",
+              "hover:bg-default-200/70",
+              "dark:hover:bg-default/70",
+              "!cursor-text",
+            ],
+          }}
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search project..."
+        ></Input>
+      </div>
+      <div>
+        <Table
+          radius="none"
+          className=" bg-[#1A0F24] text-white 
+        overflow-hidden shadow-md rounded-none border-1 border-[#4F3069]"
+          removeWrapper
+        >
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                className="bg-[#291733] text-left text-sm font-semibold
+                text-white uppercase tracking-wide rounded-none"
+                key={column.uid}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            className="bg-[#1A0F24]"
+            emptyContent="No projects found"
+            items={foundedProjects}
+          >
+            {(project) => (
+              <TableRow key={project.id} className="">
+                {(columnKey) => (
+                  <TableCell className="">
+                    {columnKey === "name" && <p>{project.name}</p>}
+                    {columnKey === "email" && <p>{project.name}</p>}
+                    {columnKey === "role" && <p>{project.name}</p>}
+                    {columnKey === "actions" && (
+                      <div className="flex flex-row gap-4">
+                        <Button
+                          key={2}
+                          variant="light"
+                          color="secondary"
+                          radius="none"
+                          className="font-bold border-purple-500"
+                          as={NextLink}
+                          href={{
+                            pathname: `/projects/project`,
+                            query: {
+                              projectId: `${project.id}`,
+                            },
+                          }}
+                        >
+                          Open
+                        </Button>
+                        <Button
+                          key={1}
+                          onPress={() => handleDeleteProject(project.id)}
+                          variant="light"
+                          color="danger"
+                          radius="none"
+                          className="font-bold border-pink-800"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="my-4 w-[50%]">
         <Button
           as={Link}
-          variant="light"
-          color="success"
-          size="lg"
-          radius="none"
-          className="border-1 border-green-500"
           href="/projects/create"
+          className="rounded-none w-full bg-[#291733] font-bold text-lg"
         >
-          Create
+          + Create new project
         </Button>
-      </div>
-
-      <div className="flex bg-zinc-950 w-[100%] justify-center my-2">
-        <div className="w-full flex flex-col gap-4">
-          {projects.map((project) => (
-            <div key={project.id} className="w-full border-1">
-              <Card key={project.id} className="bg-stone-950">
-                <CardBody key={project.id}>
-                  <div className="flex flex-row gap-4 justify-between ">
-                    <div className="">
-                      <p className="text-3xl">{project.name}</p>
-                      <p>{project.description}</p>
-                    </div>
-                    <div className="flex flex-row gap-4">
-                      <Button
-                        key={2}
-                        variant="light"
-                        color="secondary"
-                        radius="none"
-                        className="border-1 border-purple-500"
-                        as={NextLink}
-                        href={{
-                          pathname: `/projects/project`,
-                          query: {
-                            projectId: `${project.id}`,
-                          },
-                        }}
-                      >
-                        Open
-                      </Button>
-                      <Button
-                        key={1}
-                        onPress={() => handleDeleteProject(project.id)}
-                        variant="light"
-                        color="danger"
-                        radius="none"
-                        className="border-1 border-pink-800"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
