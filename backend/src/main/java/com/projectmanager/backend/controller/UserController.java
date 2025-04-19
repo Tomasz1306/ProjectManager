@@ -24,7 +24,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserFindByEmailKeyResponseDTO> findUsersByEmailKey(@RequestBody UserFindByEmailKeyRequestDTO request) {
         UserFindByEmailKeyResponseDTO response = userService.findUsersByEmailKey(request);
-        System.out.println(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

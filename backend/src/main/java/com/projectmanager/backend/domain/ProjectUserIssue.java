@@ -1,11 +1,10 @@
 package com.projectmanager.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 //Lombok annotations//
 @Data
@@ -25,9 +24,11 @@ public class ProjectUserIssue {
     
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "project_user_id")
+    @ToString.Exclude
     private ProjectUser projectUser;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "issue_id")
+    @JsonBackReference
     private Issue issue;
 }

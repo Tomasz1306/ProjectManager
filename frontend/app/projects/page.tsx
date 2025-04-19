@@ -12,7 +12,8 @@ import {
   ProjectDeleteRequestDTO,
   ProjectCreateRequestDTO,
   ProjectDeleteResponseDTO,
-  ProjectsResponseDTO, Project,
+  ProjectsResponseDTO,
+  Project,
 } from "@/types/types";
 
 // eslint-disable-next-line react/display-name
@@ -20,35 +21,44 @@ export default function () {
   const [projects, setProjects] = useState<Project[]>([]);
 
   async function handleDeleteProject(projectId: number) {
-
     const projectDeleteRequestDTO: ProjectDeleteRequestDTO = {
       projectId: projectId,
       userId: Number(localStorage.getItem("id")),
-    }
+    };
 
     const response = await fetch(
-      "http://localhost:8080/api/v1/deleteProject/" + projectId,
+      `http://localhost:8080/api/v1/projects/delete`,
       {
-        method: "DELETE",
+        method: "POST",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(projectDeleteRequestDTO),
       }
     );
     if (response.ok) {
-      const projectDeleteResponseDTO: ProjectDeleteResponseDTO = await response.json();
+      const projectDeleteResponseDTO: ProjectDeleteResponseDTO =
+        await response.json();
       console.log("USUNIETO: ", projectDeleteResponseDTO);
-      addToast({
-        title: "SUCCESS!",
-        description: "The project was successful deleted",
-        color: "danger",
-        radius: "none",
-      });
-
-      setProjects(
-        projects.filter((project, index) => project.id !== projectId)
-      );
+      if (!projectDeleteResponseDTO.status) {
+        addToast({
+          title: "CANNOT DELETE PROJECT",
+          description: projectDeleteResponseDTO.information,
+          color: "danger",
+          radius: "none",
+        });
+      } else {
+        addToast({
+          title: "SUCCESS!",
+          description: "The project was successful deleted",
+          color: "success",
+          radius: "none",
+        });
+        setProjects(
+          projects.filter((project, index) => project.id !== projectId)
+        );
+      }
     } else if (response.status === 404) {
       // PROJECT NOT FOUND
       addToast({

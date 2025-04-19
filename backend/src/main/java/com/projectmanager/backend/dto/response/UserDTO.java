@@ -1,13 +1,9 @@
 package com.projectmanager.backend.dto.response;
 
-import com.projectmanager.backend.domain.User;
-import com.projectmanager.backend.dto.response.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 //Lombok annotations//
 @Data
@@ -16,6 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 // **************** //
 
-public class UserFindByEmailKeyResponseDTO {
-    List<UserResponseDTO> users;
+public class UserDTO {
+    private Long id;
+    private String email;
+    private String name;
+    private String username;
 }

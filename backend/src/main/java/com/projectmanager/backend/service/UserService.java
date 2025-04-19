@@ -3,7 +3,7 @@ package com.projectmanager.backend.service;
 
 import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.dto.request.UserFindByEmailKeyRequestDTO;
-import com.projectmanager.backend.dto.request.UserResponseDTO;
+import com.projectmanager.backend.dto.response.UserResponseDTO;
 import com.projectmanager.backend.dto.response.UserFindByEmailKeyResponseDTO;
 import com.projectmanager.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,6 @@ public class UserService {
                     .name(user.getName())
                     .build());
         }
-        System.out.println(findedUsersDTO);
         return UserFindByEmailKeyResponseDTO
                 .builder()
                 .users(findedUsersDTO)

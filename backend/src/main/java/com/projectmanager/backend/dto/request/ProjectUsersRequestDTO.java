@@ -12,9 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 // **************** //
 
-public class UserResponseDTO {
-    private Long id;
-    private String email;
-    private String name;
-    private String username;
+public class ProjectUsersRequestDTO {
+    private Long userId;
+    private Long projectId;
 }
