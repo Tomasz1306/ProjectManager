@@ -3,18 +3,14 @@ package com.projectmanager.backend.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import com.projectmanager.backend.domain.ProjectUser;
 import com.projectmanager.backend.domain.Role;
 import com.projectmanager.backend.domain.User;
 import com.projectmanager.backend.dto.request.*;
-import com.projectmanager.backend.dto.response.UserResponseDTO;
 import com.projectmanager.backend.dto.response.*;
 import com.projectmanager.backend.repository.ProjectUserRepository;
 import com.projectmanager.backend.repository.UserRepository;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projectmanager.backend.domain.Project;
@@ -83,11 +79,26 @@ public class ProjectUserService {
         User user = userRepository.findById(userId).get();
         Optional<ProjectUser> projectUser = projectUserRepository.findByProjectAndUser(project, user);
 
-        //TODO CHANGE TO ProjectUserDTO
+        UserDTO userDTO = UserDTO
+                .builder()
+                .id(user.getId())
+                .name(user.getName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .build();
+
         if (projectUser.isPresent()) {
+            ProjectUserDTO projectUserDTO = ProjectUserDTO
+                    .builder()
+                    .id(projectUser.get().getId())
+                    .user(userDTO)
+                    .project(project)
+                    .role(projectUser.get().getProjectRole().name())
+                    .owner(projectUser.get().getIsOwner())
+                    .build();
             return ProjectUserResponseDTO
                     .builder()
-                    .projectUser(projectUser.get())
+                    .projectUser(projectUserDTO)
                     .build();
         }
         return ProjectUserResponseDTO.builder().build();

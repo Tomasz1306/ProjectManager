@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 // **************** //
 
 public class ProjectUserResponseDTO {
-    ProjectUser projectUser;
+    ProjectUserDTO projectUser;
 }

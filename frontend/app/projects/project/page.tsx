@@ -1,6 +1,6 @@
 "use client";
-import { useDisclosure } from "@heroui/react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Avatar, Button, useDisclosure } from "@heroui/react";
+import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { useEffect, useState } from "react";
 import React from "react";
@@ -14,8 +14,9 @@ import {
   Issue,
   User,
   ProjectUserResponseDTO,
-  ProjectUsersResponseDTO, ProjectUser,
-} from "@/types/types"
+  ProjectUsersResponseDTO,
+  ProjectUser,
+} from "@/types/types";
 import MemberTableComponent from "@/components/table/MemberTableComponent";
 import AddMember from "@/components/AddMember";
 
@@ -29,19 +30,16 @@ export default function ProjectPage(projectId: number) {
 
   useEffect(() => {
     async function checkToken() {
-      await fetch(
-        "http://localhost:8080/api/v1/auth/checkToken",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: localStorage.getItem("email"),
-            token: localStorage.getItem("token"),
-          }),
-        }
-      )
+      await fetch("http://localhost:8080/api/v1/auth/checkToken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: localStorage.getItem("email"),
+          token: localStorage.getItem("token"),
+        }),
+      })
         .then(async (response) => {
           console.log(response);
           if (response.ok) {
@@ -79,8 +77,10 @@ export default function ProjectPage(projectId: number) {
         }
       );
       if (response.ok) {
-        const projectUserResponseDTO: ProjectUserResponseDTO = await response.json();
+        const projectUserResponseDTO: ProjectUserResponseDTO =
+          await response.json();
         setCurrentProject(projectUserResponseDTO.projectUser.project);
+        console.log(projectUserResponseDTO);
       } else {
         router.push("/projects");
       }
@@ -91,54 +91,162 @@ export default function ProjectPage(projectId: number) {
 
   useEffect(() => {
     async function fetchProjectMembers() {
-      const response = await fetch(`http://localhost:8080/api/v1/projects/projectUsers`, {
-            method: "POST",
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: localStorage.getItem("id"),
-              projectId: params.get("projectId")
-            })
-          }
+      const response = await fetch(
+        `http://localhost:8080/api/v1/projects/projectUsers`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: localStorage.getItem("id"),
+            projectId: params.get("projectId"),
+          }),
+        }
       );
       if (response.ok) {
-        const membersProjectUsersResponseDTO: ProjectUsersResponseDTO = await response.json();
-        console.log("GDZIE USER: " , membersProjectUsersResponseDTO);
+        const membersProjectUsersResponseDTO: ProjectUsersResponseDTO =
+          await response.json();
+        console.log("GDZIE USER: ", membersProjectUsersResponseDTO);
         setProjectMembers(membersProjectUsersResponseDTO.projectUsers);
-        setOwner(membersProjectUsersResponseDTO.projectUsers.find((member) => member.owner)?.user);
-        console.log("HALO: " ,membersProjectUsersResponseDTO.projectUsers.find((member) => member.owner === true));
+        setOwner(
+          membersProjectUsersResponseDTO.projectUsers.find(
+            (member) => member.owner
+          )?.user
+        );
+        console.log(
+          "HALO: ",
+          membersProjectUsersResponseDTO.projectUsers.find(
+            (member) => member.owner === true
+          )
+        );
       }
     }
-      fetchProjectMembers();
-  }, [])
+    fetchProjectMembers();
+  }, []);
 
   useEffect(() => {
     console.log(projectMembers);
-  }, [projectMembers])
-  
+  }, [projectMembers]);
+
   return (
-    
-    <div>
-      <div className="w-full border-1 dark:bg-gray-950">
-        <div className="w-full flex flex-col justify-center">
+    <div className="bg-[#1A0F24]">
+      <div className="mx-2 flex flex-col gap-2">
+        <p className="text-4xl font-bold">{currentProject?.name}</p>
+        <p className="text-[#B08FCC]">{currentProject?.description}</p>
+        <Button radius="sm" className="max-w-20 bg-[#38214A]">
+          Edit
+        </Button>
+      </div>
+
+      <div className="">
+        <div className="flex flex-col gap-2">
           <Tabs
             aria-label="Project"
             radius="none"
             variant="underlined"
             size="lg"
-            className="my-2 flex justify-center"
             color="secondary"
+            className="flex text-[#B08FCC]"
           >
             <Tab title="Overview">
-              <p className="text-small text-default-500 mx-3">Project name</p>
-              <Card
+              <div className="flex flex-col gap-8">
+                <p className="text-3xl font-bold">Overview</p>
+                <Divider></Divider>
+                <div>
+                  <div className="flex flex-row gap-[40%]">
+                    <p>Status</p>
+                    <p>Target date</p>
+                  </div>
+                  <div className="flex flex-row gap-[40%]">
+                    <p>Budget</p>
+                  </div>
+                </div>
+                <Divider></Divider>
+                <p className="text-3xl font-bold">Mile Stones</p>
+                <Divider />
+                <p className="text-3xl font-bold">Tech Stack</p>
+                <Divider></Divider>
+                <p className="text-3xl font-bold">Members</p>
+                <div className="grid grid-flow-col gap-8">
+                  {projectMembers.map((member) => (
+                    <Card className=" bg-[#38214A]/20" radius="sm">
+                      <CardHeader>
+                        <div className="flex flex-row gap-4">
+                          <Avatar></Avatar>
+                          <div className="flex flex-col">
+                          <p className="text-lg">{member.user.name}</p>
+                          <p className="text-sm text-white/50">{member.user.email}</p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-2xl">{member.role}</p>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </div>
+                <Divider></Divider>
+                <div>
+                <p>Issue Tracker</p>
+                  <div className="flex flex-row justify-between">
+                    
+                    <Card className="w-1/5 bg-[#38214A]/20" radius="sm">
+                      <CardHeader>
+                        <p className="text-sm">Open Issue</p>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-3xl">54</p>
+                      </CardBody>
+                      <CardFooter>
+                        <p className="text-green-500">+25%</p>
+                      </CardFooter>
+                    </Card>
+                    <Card className="w-1/5 bg-[#38214A]/20" radius="sm">
+                      <CardHeader>
+                        <p className="text-sm">In Progress</p>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-3xl">30</p>
+                      </CardBody>
+                      <CardFooter>
+                        <p className="text-green-500">+25%</p>
+                      </CardFooter>
+                    </Card>
+                    <Card className="w-1/5 bg-[#38214A]/20" radius="sm">
+                      <CardHeader>
+                        <p className="text-sm">Closed Issue</p>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-3xl">26</p>
+                      </CardBody>
+                      <CardFooter>
+                        <p className="text-green-500">+20%</p>
+                      </CardFooter>
+                    </Card>
+                    <Card className="w-1/5 bg-[#38214A]/20" radius="sm">
+                      <CardHeader>
+                        <p className="text-sm">Total Issue</p>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-3xl">100</p>
+                      </CardBody>
+                      <CardFooter>
+                        <p className="text-green-500">+5%</p>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+
+              {/* <Card
                 key="Overview"
                 title="Overview"
                 className="bg-transparent my-2"
                 radius="none"
               >
+               
                 <CardBody>
                   <div className=" flex flex-row">
                     <div className="basis-1/3">
@@ -182,21 +290,23 @@ export default function ProjectPage(projectId: number) {
                     <p className="text-lg">Meetings soon</p>
                   </div>
                 </CardBody>
-              </Card>
+              </Card> */}
             </Tab>
             <Tab title="Members" className="rounded-sm ">
               <Card className="bg-transparent rounded-sm">
                 <CardHeader>
-                  <AddMember projectId={Number(params.get("projectId"))}
-                   projectOwner={owner}
-                   projectMembers={projectMembers}
-                   setProjectMembers={setProjectMembers}
-                   ></AddMember>
+                  <AddMember
+                    projectId={Number(params.get("projectId"))}
+                    projectOwner={owner}
+                    projectMembers={projectMembers}
+                    setProjectMembers={setProjectMembers}
+                  ></AddMember>
                 </CardHeader>
                 <CardBody className="bg-transparent">
-                  <MemberTableComponent projectMembers={projectMembers} setProjectMembers={setProjectMembers}>
-
-                  </MemberTableComponent>
+                  <MemberTableComponent
+                    projectMembers={projectMembers}
+                    setProjectMembers={setProjectMembers}
+                  ></MemberTableComponent>
                 </CardBody>
               </Card>
             </Tab>
