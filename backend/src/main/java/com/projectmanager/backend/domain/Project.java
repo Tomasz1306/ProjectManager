@@ -42,4 +42,19 @@ public class Project {
     @ToString.Exclude
     @JsonIgnore
     private List<ProjectUser> projectUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    @JsonIgnore
+    private List<MileStone> mileStones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    @JsonIgnore
+    private List<Technology> technologies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    @JsonIgnore
+    private List<Documentation> documentations = new ArrayList<>();
 }
